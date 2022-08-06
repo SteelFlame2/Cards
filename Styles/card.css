@@ -1,0 +1,90 @@
+.card {
+    background-color: rgb(196, 196, 0);
+    color: rgb(50, 70, 107);
+    position: absolute;
+    display: flexbox;
+    min-width: 130px;
+    max-width: 230px;
+    overflow-wrap: break-word;
+    cursor: default;
+    font-family: HandDraw;
+    font-weight: 600;
+    font-size: 17px;
+}
+
+.card hr {
+    border: 1px solid rgb(173, 178, 15);
+    margin: 0;
+}
+
+.card #header {
+    background-color: rgb(212, 219, 19);
+    padding: 3px;
+    padding-left: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card #header #text {
+    max-width: 82%;
+}
+
+.card #header #closer {
+    margin-right: 5px;
+}
+
+.card #content {
+    padding: 5px;
+}
+
+.card .completenessSvg {
+    width: 17px;
+    height: 17px;
+}
+
+.card .listOfTasks {
+    display: flex;
+    flex-direction: row;
+}
+
+.card .tasks {
+    padding: 0;
+    margin: 0;
+    color: rgb(20, 101, 67);
+    list-style-type: none;
+    width: 100%;
+}
+
+.card .tasks li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 5px;
+}
+
+.card .tasks li .taskText {
+    width: 80%;
+}
+
+.card input[type="text"],
+input[type="button"],
+textarea {
+    background: none;
+    border: none;
+    font-size: 16px;
+}
+
+.card input[type="text"] {
+    border-bottom: 1px dashed black;
+}
+
+.card input[type="button"]:not(.nodeActionButton) {
+    border: 1px solid gray;
+    border-radius: 3px;
+    background-color: rgb(255, 255, 255, 0.4);
+}
+
+.nodeActionButton {
+    color: #CA0000;
+}

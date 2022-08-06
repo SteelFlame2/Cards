@@ -1,0 +1,12 @@
+@font-face {
+    font-family: HandDraw;
+    src: url(Handlee.ttf);
+}
+
+body {
+    background-color: rgb(74, 74, 74);
+    color: rgb(199, 199, 199);
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 16px;
+    overflow: hidden;
+}

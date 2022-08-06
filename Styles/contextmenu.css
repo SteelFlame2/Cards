@@ -1,0 +1,36 @@
+.context-menu {
+    position: fixed;
+    border-radius: 6px;
+    background-color: #272727;
+    cursor: default;
+    transform-origin: top left;
+    transform: scale(0);
+    transition: transform 0.05s;
+    z-index: 10000;
+}
+
+.context-menu.visible {
+    transform: scale(1);
+}
+
+.context-menu ul li {
+    padding: 5px;
+}
+
+.context-menu ul li.not-clickable {
+    color: #747474;
+}
+
+.context-menu ul li.clickable {
+    color: #C7C7C7;
+}
+
+.context-menu ul li:not(.not-clickable):hover {
+    background-color: #3B3B3B;
+}
+
+.context-menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
