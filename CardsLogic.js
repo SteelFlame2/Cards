@@ -9,6 +9,7 @@ function restartSelectionLostTimer() {
         selectedCard1 = -1;
     }, 2 * 1000);
 }
+var isSomeCardClicked = false;
 class Card {
     constructor(id = -1, CardDOM) {
         this.id = id;
@@ -16,6 +17,8 @@ class Card {
 
         this.clickOffset = [0, 0];
         this.isClicked = false;
+
+        this.isSelected = false;
 
         this.Initialize();
 
@@ -58,15 +61,28 @@ class Card {
                     }
                 }
             }
+            if (!isCntrlClicked) {
+                for (let i = 0; i < Cards.length; i++) {
+                    Cards[i].Unselect();
+                }
+            }
+            this.Select();
             this.isClicked = true;
+            isSomeCardClicked = true;
         });
         document.addEventListener("mouseup", (e) => {
+            // this.isSelected = false;
             this.isClicked = false;
+            isSomeCardClicked = false;
         });
         document.addEventListener("mousemove", (e) => {
-            if (this.isClicked) {
-                this.cardDOM.style.top = (e.clientY - this.clickOffset[1]) + "px";
-                this.cardDOM.style.left = (e.clientX - this.clickOffset[0]) + "px";
+            // if (this.isClicked) {
+            //     this.cardDOM.style.top = (e.clientY - this.clickOffset[1]) + "px";
+            //     this.cardDOM.style.left = (e.clientX - this.clickOffset[0]) + "px";
+            // }
+            if (this.isSelected && isSomeCardClicked) {
+                this.cardDOM.style.left = Number(this.cardDOM.style.left.slice(0, -2)) + (e.movementX / window.devicePixelRatio) + "px";
+                this.cardDOM.style.top = Number(this.cardDOM.style.top.slice(0, -2)) + (e.movementY / window.devicePixelRatio) + "px";
             }
         });
         document.addEventListener("mousedown", (e) => {
@@ -80,6 +96,7 @@ class Card {
                 }
             }
             if (!isCard) {
+                this.Unselect();
                 if (!Cards[selectedCard1]) return;
                 Cards[selectedCard1].cardDOM.style.border = "";
                 selectedCard1 = -1;
@@ -88,9 +105,14 @@ class Card {
         let closer = this.cardDOM.getElementsByClassName("closer");
         if (closer.length > 0) {
             closer[0].addEventListener("mousedown", (e) => {
-                let len = this.connectedLines.length;
-                for (let i = 0; i < len; i++) {
-                    deleteLine(this.connectedLines[0], true);
+                let linesToDelete = [];
+                for (let i = 0; i < Lines.length; i++) {
+                    if (Lines[i].card1 == this || Lines[i].card2 == this) {
+                        linesToDelete.push(i);
+                    }
+                }
+                for (let i = 0; i < linesToDelete.length; i++) {
+                    deleteLine(linesToDelete[i]);
                 }
                 for (let i = this.id + 1; i < Cards.length; i++) {
                     Cards[i].id -= 1;
@@ -101,6 +123,15 @@ class Card {
                 return;
             });
         }
+    }
+    Select() {
+        this.isSelected = true;
+        this.cardDOM.style.border = "1px dashed green";
+    }
+    Unselect() {
+        this.isSelected = false;
+        this.cardDOM.style.border = "";
+
     }
     getCardData() {
         let HeaderText = this.cardDOM.children[0].children[0].innerText;
@@ -117,22 +148,29 @@ class Card {
                 ContentData.push({ Type: "List", name: ContentChildrens[i].firstChild.nodeValue, data: ListTasks });
             }
         }
-        return [HeaderText, ContentData, [this.cardDOM.offsetLeft, this.cardDOM.offsetTop]]
-        let text = "";
-        text += HeaderText + ";";
-        for (let i = 0; i < ContentData.length; i++) {
-            if (ContentData[i].Type == "Span") {
-                text += ("Span" + i) + ":" + ContentData[i].data + ";";
-            } else if (ContentData[i].Type == "List") {
-                text += ("Task" + i) + ":" + ContentData[i].name + ":";
-                for (let j = 0; j < ContentData[i].data.length; j++) {
-                    text += j + ":" + ContentData[i].data[j] + ",";
-                }
-                text += ";";
-            }
+        return [HeaderText, ContentData, [this.cardDOM.offsetLeft, this.cardDOM.offsetTop]];
+    }
+    isPointOnCard(x, y) {
+        if (x > this.cardDOM.offsetLeft && x < this.cardDOM.offsetLeft + this.cardDOM.offsetWidth &&
+            y > this.cardDOM.offsetTop && y < this.cardDOM.offsetTop + this.cardDOM.offsetHeight) {
+            return true;
         }
-        return text;
-        // return [HeaderText, ContentData];
+        return false;
+    }
+    isCardInArea(Min, Max) {
+        let _min = [
+            Math.min(Min[0], Max[0]),
+            Math.min(Min[1], Max[1]),
+        ];
+        let _max = [
+            Math.max(Min[0], Max[0]),
+            Math.max(Min[1], Max[1]),
+        ];
+        if (this.cardDOM.offsetLeft > _min[0] && this.cardDOM.offsetLeft < _max[0] &&
+            this.cardDOM.offsetTop > _min[1] && this.cardDOM.offsetTop < _max[1]) {
+            return true;
+        }
+        return false;
     }
 }
 let Cards = [];
@@ -141,6 +179,8 @@ let _cards = document.getElementsByClassName("card");
 for (let i = 0; i < _cards.length; i++) {
     Cards.push(new Card(i, _cards[i]));
 }
+
+
 
 function createListOfTasks(ListName, Tasks) { // Just array of strings with task text 
     let ulMain = document.createElement("ul");
@@ -170,7 +210,7 @@ function createListOfTasks(ListName, Tasks) { // Just array of strings with task
 
     return ulMain;
 }
-function createTextReminder(Text) {
+function createTextRe_minder(Text) {
     let Span = document.createElement("span");
     Span.innerHTML = Text;
     Span.className = "textReminder";

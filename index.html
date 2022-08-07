@@ -48,127 +48,28 @@
         <div id="content">
             <input id="RemindTextInput" type="text" placeholder="Write text to remind"
                 style="border-bottom: 1px dashed #4DCA33" cols="21" rows="3"></input>
-            <script>
-                var cardContent = document.getElementById("content");
-                let RemindTextInput = document.getElementById("RemindTextInput");
-                RemindTextInput.addEventListener("keydown", (e) => {
-                    if (e.code == "Enter") {
-                        let newTextRemind = createTextReminder(RemindTextInput.value);
-                        newTextRemind.className += " toCreate toDelete";
-
-                        let deleteButton = document.createElement("input");
-                        deleteButton.type = "button";
-                        deleteButton.value = "x";
-                        deleteButton.className = "nodeActionButton";
-                        deleteButton.addEventListener("click", (e) => {
-                            e.target.parentElement.previousSibling.remove();
-                            e.target.parentElement.remove();
-                        });
-                        newTextRemind.appendChild(deleteButton);
-                        let BR = document.createElement("br");
-                        BR.className = "toCreate toDelete";
-                        if (cardContent.lastElementChild.nodeName != "SCRIPT") {
-                            cardContent.appendChild(BR);
-                        }
-                        cardContent.appendChild(newTextRemind);
-
-                        RemindTextInput.value = "";
-                    }
-                });
-            </script>
 
             <input id="TaskListNameInput" type="text" placeholder="Create list of tasks(Name here)"
                 style="border-bottom: 1px dashed #679DCA">
-            <script>
-                let TaskListNameInput = document.getElementById("TaskListNameInput");
-
-                TaskListNameInput.addEventListener("keydown", (e) => {
-                    if (e.code == "Enter") {
-                        let ulMain = document.createElement("ul");
-                        ulMain.className = "tasks toCreate toDelete";
-                        ulMain.innerHTML += TaskListNameInput.value;
-
-                        let ULDeleteButton = document.createElement("input");
-                        ULDeleteButton.type = "button";
-                        ULDeleteButton.value = "x";
-                        ULDeleteButton.className = "nodeActionButton";
-                        ULDeleteButton.addEventListener("click", (e) => {
-                            e.target.parentElement.remove
-                            e.target.parentElement.remove();
-                        });
-                        ulMain.appendChild(ULDeleteButton);
-
-
-                        let createNewTaskInput = document.createElement("input");
-                        createNewTaskInput.type = "text";
-                        createNewTaskInput.className = "toPreDelete";
-                        createNewTaskInput.addEventListener("keydown", (e) => {
-                            if (e.code == "Enter") {
-                                let newLi = document.createElement("li");
-                                newLi.innerHTML += "<span class='taskText'>" + e.target.value + "</span>";
-                                newLi.innerHTML += `
-                                    <img src="Images/UncompleteTask.svg" class="completenessSvg" id="unCompleteSvg"></img>
-                                `;
-
-                                let TaskDeleteButton = document.createElement("input");
-                                TaskDeleteButton.type = "button";
-                                TaskDeleteButton.value = "x";
-                                TaskDeleteButton.className = "nodeActionButton";
-                                TaskDeleteButton.addEventListener("click", (e) => {
-                                    e.target.parentElement.remove();
-                                });
-                                newLi.appendChild(TaskDeleteButton);
-
-                                ulMain.appendChild(newLi);
-                                createNewTaskInput.value = "";
-                            }
-                        });
-
-
-                        ulMain.appendChild(createNewTaskInput);
-                        cardContent.appendChild(ulMain);
-
-                        TaskListNameInput.value = "";
-                    }
-                });
-            </script>
 
             <input id="CreateNewStickButton" type="button" value="Accept" style="width:100%; margin-top:10px">
-            <script>
-                let CreateNewStickButton = document.getElementById("CreateNewStickButton");
-                let creatingCard = document.getElementById("creatingCard");
-                CreateNewStickButton.addEventListener("click", (e) => {
-                    let toCreateElements = creatingCard.getElementsByClassName("toCreate");
-                    // console.log(toCreateElements);
-                    let nodeActionButtons = creatingCard.getElementsByClassName("nodeActionButton");
-                    while (nodeActionButtons.length > 0) {
-                        nodeActionButtons[0].remove();
-                    }
-                    let toPreDeleteElements = creatingCard.getElementsByClassName("toPreDelete");
-                    while (toPreDeleteElements.length > 0) {
-                        toPreDeleteElements[0].remove();
-                    }
-                    createNewStick(HeaderName, toCreateElements);
-
-                    let toDeleteElements = creatingCard.getElementsByClassName("toDelete");
-                    while (toDeleteElements.length > 0) {
-                        toDeleteElements[0].remove();
-                    }
-
-                });
-
-            </script>
         </div>
     </div>
 
     <script src="CardsLogic.js"></script>
+    <script src="CardsCreator.js"></script>
     <div class="context-menu hidden" id="document-context-menu">
         <ul>
             <li class="context-menu-element" id="create-new-stick"
                 onclick="setThickness(); setContextMenuVisibility(0)">Update weights</li>
+            <li id="transfer-creator-card"
+                onclick="setContextMenuVisibility(0); cardCreator.dom.style.left=(mousePosition[0])+'px';cardCreator.dom.style.top=(mousePosition[1])+'px'">
+                Get creator card
+            </li>
             <li class="not-clickable" id="set-main-line">
                 Set line as main</li>
             <li class="not-clickable" id="delete-line">Delete line</li>
+            <li class="not-clickable" id="card-editor">Edit card</li>
         </ul>
     </div>
     <script src="ContextMenu.js"></script>

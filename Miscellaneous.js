@@ -1,14 +1,33 @@
-// Mouse data
+// Usefull data
 var mousePosition = [0, 0];
 document.addEventListener("mousemove", (e) => {
     mousePosition = [e.clientX, e.clientY];
+});
+
+var isCntrlClicked = false;
+var isShiftClicked = false;
+document.addEventListener("keydown", (e) => {
+    if (e.code == "ControlLeft") {
+        isCntrlClicked = true;
+    }
+    if (e.code == "ShiftLeft") {
+        isShiftClicked = true;
+    }
+});
+document.addEventListener("keyup", (e) => {
+    if (e.code == "ControlLeft") {
+        isCntrlClicked = false;
+    }
+    if (e.code == "ShiftLeft") {
+        isShiftClicked = false;
+    }
 });
 // Window scroll as drag
 var scrollingBounder = document.getElementById("scrolling-bounds");
 
 let isClickHoldsOnDocument = false;
 document.addEventListener("mousedown", (e) => {
-    if (e.buttons == 1 && (e.target == canvas || e.target == document.body)) {
+    if (e.buttons == 1 && (e.target == canvas || e.target == document.body) && !isShiftClicked) {
         isClickHoldsOnDocument = true
     }
 });
@@ -29,6 +48,28 @@ document.addEventListener("blur", () => {
     isClickHoldsOnDocument = false;
 });
 
+// Selection square
+
+document.addEventListener("mousedown", (e) => {
+    if (e.buttons == 1 && isShiftClicked) {
+        selectionSquare.min = [mousePosition[0], mousePosition[1]];
+        selectionSquare.max = [e.clientX - selectionSquare.min[0], e.clientY - selectionSquare.min[1]];
+        selectionSquare.isExist = true;
+    }
+});
+document.addEventListener("mousemove", (e) => {
+    if (e.buttons == 1 && isShiftClicked) {
+        selectionSquare.max = [e.clientX - selectionSquare.min[0], e.clientY - selectionSquare.min[1]];
+    }
+});
+document.addEventListener("mouseup", (e) => {
+    for (let i = 0; selectionSquare.isExist && i < Cards.length; i++) {
+        if (Cards[i].isCardInArea(selectionSquare.min, [selectionSquare.min[0] + selectionSquare.max[0], selectionSquare.min[1] + selectionSquare.max[1]])) {
+            Cards[i].Select();
+        }
+    }
+    selectionSquare.isExist = false;
+});
 
 // DataBase functions
 var save1req = window.indexedDB.open("Save 1", 1);
@@ -90,7 +131,9 @@ function loadData(path) {
             let newContent = [];
             for (let j = 0; j < e.target.result[i].Content.length; j++) {
                 if (e.target.result[i].Content[j].Type == "Span") {
-                    newContent.push(createTextReminder(e.target.result[i].Content[j].data));
+                    let span = createTextReminder(e.target.result[i].Content[j].data);
+                    span.appendChild(document.createElement("br"));
+                    newContent.push(span);
                 } else if (e.target.result[i].Content[j].Type == "List") {
                     newContent.push(createListOfTasks(e.target.result[i].Content[j].name, e.target.result[i].Content[j].data));
                 }
@@ -111,9 +154,12 @@ function loadData(path) {
         }
     }
 }
+var isWindowLoaded = false;
 window.onbeforeunload = function () {
-    saveData();
+    if (isWindowLoaded)
+        saveData();
 }
 window.onload = function () {
     loadData();
+    isWindowLoaded = true;
 }

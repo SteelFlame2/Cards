@@ -1,5 +1,6 @@
 let canv = document.getElementById("canvas");
 let ctx = canv.getContext("2d");
+// let ctx = canv.getContext("webgl");
 
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
@@ -30,6 +31,11 @@ function getInViewport(x, y) {
 }
 
 var nominalLength = 3;
+var selectionSquare = {
+    min: [0, 0],
+    max: [0, 0],
+    isExist: false
+};
 
 document.body.addEventListener("mousedown", (e) => {
     if (e.button == 1) e.preventDefault()
@@ -109,8 +115,8 @@ var Lines = [];
 
 function createNewLine(card1, card2) {
     let newL = Lines.push(new Line(card1, card2, Lines.length));
-    card1.connectedLines.push(newL - 1);
-    card2.connectedLines.push(newL - 1);
+    card1.connectedLines.push(Lines[newL - 1]);
+    card2.connectedLines.push(Lines[newL - 1]);
 }
 function deleteLine(id, refreshConnections = false) {
     if (refreshConnections) {
@@ -122,8 +128,10 @@ function deleteLine(id, refreshConnections = false) {
             }
         }
     }
-    for (let i = id + 1; i < Lines.length; i++) {
+    for (let i = id; i < Lines.length; i++) {
         Lines[i].id--;
+        Lines[i].dom1 = Lines[i].card1.cardDOM;
+        Lines[i].dom2 = Lines[i].card2.cardDOM;
     }
     Lines.splice(id, 1);
 }
@@ -218,6 +226,15 @@ function update() {
     for (let i = 0; i < Lines.length; i++) {
         Lines[i].update();
         Lines[i].draw();
+    }
+    if (selectionSquare.isExist) {
+        ctx.strokeStyle = "white";
+        let selectionSquareInView = {
+            min: getInViewport(selectionSquare.min[0], selectionSquare.min[1]),
+            max: getInViewport(selectionSquare.max[0], selectionSquare.max[1]),
+        };
+        // ctx.strokeRect(selectionSquareInView.min[0], selectionSquareInView.min[1], selectionSquareInView.max[0], selectionSquareInView.max[1]);
+        ctx.strokeRect(selectionSquare.min[0], selectionSquare.min[1], selectionSquare.max[0], selectionSquare.max[1]);
     }
 
     requestAnimationFrame(update);

@@ -19,6 +19,7 @@
 
 .context-menu ul li.not-clickable {
     color: #747474;
+    display: none;
 }
 
 .context-menu ul li.clickable {
