@@ -210,7 +210,7 @@ function createListOfTasks(ListName, Tasks) { // Just array of strings with task
 
     return ulMain;
 }
-function createTextRe_minder(Text) {
+function createTextReminder(Text) {
     let Span = document.createElement("span");
     Span.innerHTML = Text;
     Span.className = "textReminder";
