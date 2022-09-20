@@ -17,6 +17,7 @@ window.onresize = function (e) {
 }
 
 let haveBackgroundNoise = false;
+let isBackgroundTurned = true;
 
 function initShaders(gl, vs_source, fs_source) {
     // Compile shaders
@@ -136,6 +137,7 @@ initShaders(bg, document.getElementById('shaderVs').text, document.getElementByI
 bg.clearColor(0, 0, 0, 1);
 function backUpdate() {
     let startTime = new Date();
+    if (!isBackgroundTurned) return;
     bg.viewport(0, 0, bgCanv.width, bgCanv.height);
 
     initVertexBuffers(bg);

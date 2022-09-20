@@ -4,7 +4,7 @@ var lastConextMenuCallPosition = [0, 0];
 var contexLineDeleter = document.getElementById("delete-line");
 var cardEditor = document.getElementById("card-editor");
 var weightsUpdater = document.getElementById("update-weights");
-
+var backgroundStateToggle = document.getElementById("background-state");
 function setContextMenuVisibility(state = 0) {
     if (state == 0) {
         contextMenuDocumentDom.className = "context-menu hidden";
@@ -62,15 +62,24 @@ cardEditor.addEventListener("click", (e) => {
     setContextMenuVisibility(0);
 });
 
-let contextMenuElements = document.getElementsByClassName("context-menu-element");
-for (let i = 0; i < contextMenuElements.length; i++) {
-    contextMenuElements[i].addEventListener("onclick", (e) => {
-        console.log(e);
-    });
-}
 weightsUpdater.addEventListener("click", (e => {
     mainLine = findHoveredLineInPoint(lastConextMenuCallPosition)[1];
     setThickness();
     mainLine = -1;
     setContextMenuVisibility(0);
 }));
+backgroundStateToggle.addEventListener("click", (e)=>{
+    if (backgroundStateToggle.className == "toggle-on") {
+        bg.clearColor(0, 0, 0, 1);
+        backgroundStateToggle.innerHTML = "Turn off background";
+        isBackgroundTurned = true;
+        backgroundStateToggle.className = "toggle-off";
+    } else {
+        bg.clearColor(0, 0, 0, 0);
+        bg.clear(bg.COLOR_BUFFER_BIT | bg.DEPTH_BUFFER_BIT);
+        backgroundStateToggle.innerHTML = "Turn on background";
+        isBackgroundTurned = false;
+        backgroundStateToggle.className = "toggle-on";
+    }
+    setContextMenuVisibility(0);
+});

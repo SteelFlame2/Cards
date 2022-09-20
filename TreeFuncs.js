@@ -11,13 +11,6 @@ class TreeElem {
         this.connections = connections;
     }
 }
-function reformatLines() {
-    let _Lines = [];
-    for (let i = 0; i < Lines.length; i++) {
-        _Lines.push({ p1: Lines[i].card1, p2: Lines[i].card2 });
-    }
-    return _Lines;
-}
 function findObjectAsTreeElem(ObjToFind, TreeElems) {
     for (let i = 0; i < TreeElems.length; i++) {
         if (TreeElems[i].obj == ObjToFind) {

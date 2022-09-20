@@ -62,17 +62,17 @@
     <script src="CardsCreator.js"></script>
     <div class="context-menu hidden" id="document-context-menu">
         <ul>
-            <li class="context-menu-element" id="update-weights" >Update weights</li>
+            <li id="update-weights" >Update weights</li>
             <li id="transfer-creator-card"
                 onclick="setContextMenuVisibility(0); cardCreator.dom.style.left=(mousePosition[0])+'px';cardCreator.dom.style.top=(mousePosition[1])+'px'">
                 Get creator card
             </li>
             <li class="not-clickable" id="delete-line">Delete line</li>
             <li class="not-clickable" id="card-editor">Edit card</li>
+            <li class="toggle-off" id="background-state">Turn off background</li>
         </ul>
     </div>
     <script src="ContextMenu.js"></script>
-    <script src="Lines.js"></script>
     <script src="Miscellaneous.js"></script>
 
     <script id="shaderVs" type="x-shader/x-vertex">
@@ -392,6 +392,7 @@
             //gl_FragColor = vec4(colors[minI],.5);
         }
     </script>
+    <script src="Lines.js"></script>
     <script src="Canvas.js"></script>
 </body>
 

@@ -103,6 +103,13 @@ class Line {
 }
 var Lines = [];
 
+function reformatLines() {
+    let _Lines = [];
+    for (let i = 0; i < Lines.length; i++) {
+        _Lines.push({ p1: Lines[i].card1, p2: Lines[i].card2 });
+    }
+    return _Lines;
+}
 function createNewLine(card1, card2) {
     let newL = Lines.push(new Line(card1, card2, Lines.length));
     card1.connectedLines.push(Lines[newL - 1]);
