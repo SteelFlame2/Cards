@@ -1,9 +1,9 @@
 var contextMenuDocumentDom = document.getElementById("document-context-menu");
 var lastConextMenuCallPosition = [0, 0];
 
-var mainLineSetter = document.getElementById("set-main-line");
 var contexLineDeleter = document.getElementById("delete-line");
 var cardEditor = document.getElementById("card-editor");
+var weightsUpdater = document.getElementById("update-weights");
 
 function setContextMenuVisibility(state = 0) {
     if (state == 0) {
@@ -20,15 +20,15 @@ document.addEventListener("contextmenu", (e) => {
     setContextMenuVisibility(1);
     contextMenuDocumentDom.style.left = e.clientX + "px";
     contextMenuDocumentDom.style.top = e.clientY + "px";
-    lastConextMenuCallPosition = [e.clientX, e.clientY];
+    lastConextMenuCallPosition = [e.pageX, e.pageY];
 
     let hover = findHoveredLineInPoint(e.clientX, e.clientY);
     if (hover[0]) {
-        mainLineSetter.className = "clickable";
         contexLineDeleter.className = "clickable";
+        weightsUpdater.className = "clickable";
     } else {
-        mainLineSetter.className = "not-clickable";
         contexLineDeleter.className = "not-clickable";
+        weightsUpdater.className = "not-clickable";
     }
 
     let isOnCard = false;
@@ -50,11 +50,6 @@ document.addEventListener("mousedown", (e) => {
     }
 });
 
-mainLineSetter.addEventListener("click", (e) => {
-    let hover = findHoveredLineInPoint(lastConextMenuCallPosition);
-    if (hover[0]) { mainLine = hover[1]; }
-    setContextMenuVisibility(0);
-});
 contexLineDeleter.addEventListener("click", (e) => {
     let hover = findHoveredLineInPoint(lastConextMenuCallPosition);
     if (hover[0]) {
@@ -73,3 +68,9 @@ for (let i = 0; i < contextMenuElements.length; i++) {
         console.log(e);
     });
 }
+weightsUpdater.addEventListener("click", (e => {
+    mainLine = findHoveredLineInPoint(lastConextMenuCallPosition)[1];
+    setThickness();
+    mainLine = -1;
+    setContextMenuVisibility(0);
+}));

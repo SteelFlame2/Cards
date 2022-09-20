@@ -83,6 +83,7 @@ class Card {
             if (this.isSelected && isSomeCardClicked) {
                 this.cardDOM.style.left = Number(this.cardDOM.style.left.slice(0, -2)) + (e.movementX / window.devicePixelRatio) + "px";
                 this.cardDOM.style.top = Number(this.cardDOM.style.top.slice(0, -2)) + (e.movementY / window.devicePixelRatio) + "px";
+                backUpdate();
             }
         });
         document.addEventListener("mousedown", (e) => {
@@ -187,12 +188,24 @@ function createListOfTasks(ListName, Tasks) { // Just array of strings with task
     ulMain.innerHTML += ListName;
 
     for (let i = 0; i < Tasks.length; i++) {
+
         ulMain.innerHTML += `
             <li>
-                <div>${Tasks[i]}</div><img src="Images/UncompleteTask.svg" class="completenessSvg" id="unCompleteSvg" alt="Completeness">
+                <div>${Tasks[i]}</div><img src="Images/UncompleteTask.svg" class="completenessSvg" alt="Completeness">
             </li>
         `;
     }
+    // completenessButton.onmousedown = function (e) {
+    //     if (e.buttons == 1) {
+    //         if (newCompletenessButton.classList[1] == "uncomplete") {
+    //             newCompletenessButton.src = "Images/CompleteTask.svg";
+    //             newCompletenessButton.classList.replace("uncomplete", "complete");
+    //         } else {
+    //             newCompletenessButton.src = "Images/UncompleteTask.svg";
+    //             newCompletenessButton.classList.replace("complete", "uncomplete");
+    //         }
+    //     }
+    // }
     let svgs = ulMain.getElementsByClassName("completenessSvg");
     for (let i = 0; i < svgs.length; i++) {
         svgs[i].addEventListener("mousedown", (e) => {
@@ -242,11 +255,13 @@ function createNewStick(Header, Content, Offset = [Math.random() * (window.clien
     cardDom.style.left = Offset[0] + "px";
     cardDom.style.top = Offset[1] + "px";
 
-    document.body.appendChild(cardDom);
+    let newNode = document.body.appendChild(cardDom);
     Cards.push(new Card(Cards.length, cardDom));
+
+    return newNode;
 }
 
-// createNewStick("Fruits", [createTextReminder("Just a fruits... What?"), createListOfTasks("Fruits", ["Banana", "Apple", "Your mom"])])
+createNewStick("Fruits", [createTextReminder("Just a fruits... What?"), createListOfTasks("Fruits", ["Banana", "Apple", "Your mom"])])
 // createNewStick("Fruits", [createTextReminder("Just a fruits... What?"), createListOfTasks("Fruits", ["Banana", "Apple", "Your mom"])])
 // createNewStick("Fruits", [createTextReminder("Just a fruits... What?"), createListOfTasks("Fruits", ["Banana", "Apple", "Your mom"])])
 // createNewStick("Fruits", [createTextReminder("Just a fruits... What?"), createListOfTasks("Fruits", ["Banana", "Apple", "Your mom"])])

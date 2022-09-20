@@ -1,13 +1,3 @@
-let canv = document.getElementById("canvas");
-let ctx = canv.getContext("2d");
-// let ctx = canv.getContext("webgl");
-
-canv.width = window.innerWidth;
-canv.height = window.innerHeight;
-window.onresize = function (e) {
-    canv.width = window.innerWidth;
-    canv.height = window.innerHeight;
-}
 
 function magnitude(a) {
     return Math.sqrt((a[0] ** 2) + (a[1] ** 2));
@@ -30,7 +20,7 @@ function getInViewport(x, y) {
     return [x - window.scrollX, y - window.scrollY];
 }
 
-var nominalLength = 3;
+var nominalLength = 5;
 var selectionSquare = {
     min: [0, 0],
     max: [0, 0],
@@ -46,8 +36,8 @@ let onLineHoveredFuncs = [];
 onLineHoveredFuncs.push((line) => {
     ctx.font = "16px Arial";
     ctx.fillStyle = "rgb(0,255,0)";
-    ctx.fillText("ID: " + line.id, mousePosition[0], mousePosition[1]);
-    ctx.fillText("Thick: " + line.thickness, mousePosition[0], mousePosition[1] - 16);
+    ctx.fillText("ID: " + line.id, canvasMousePosition[0], canvasMousePosition[1]);
+    ctx.fillText("Thick: " + line.thickness, canvasMousePosition[0], canvasMousePosition[1] - 16);
 });
 class Line {
     constructor(card1 = undefined, card2 = undefined, id = -1) {
@@ -218,6 +208,8 @@ function setThickness(StartLines = findFirstLines()) {
         last = findConnectedLines(comparedLast, exceptions);
         ind++;
     }
+    if (mainLine != -1)
+        Lines[mainLine].thickness = nominalLength;
 }
 
 function update() {
@@ -229,14 +221,9 @@ function update() {
     }
     if (selectionSquare.isExist) {
         ctx.strokeStyle = "white";
-        let selectionSquareInView = {
-            min: getInViewport(selectionSquare.min[0], selectionSquare.min[1]),
-            max: getInViewport(selectionSquare.max[0], selectionSquare.max[1]),
-        };
         // ctx.strokeRect(selectionSquareInView.min[0], selectionSquareInView.min[1], selectionSquareInView.max[0], selectionSquareInView.max[1]);
-        ctx.strokeRect(selectionSquare.min[0], selectionSquare.min[1], selectionSquare.max[0], selectionSquare.max[1]);
+        ctx.strokeRect(selectionSquare.min[0] - window.scrollX, selectionSquare.min[1] - window.scrollY, selectionSquare.max[0], selectionSquare.max[1]);
     }
-
     requestAnimationFrame(update);
 }
 requestAnimationFrame(update);

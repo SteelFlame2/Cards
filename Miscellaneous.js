@@ -1,7 +1,9 @@
 // Usefull data
 var mousePosition = [0, 0];
+var canvasMousePosition = [0, 0];
 document.addEventListener("mousemove", (e) => {
-    mousePosition = [e.clientX, e.clientY];
+    mousePosition = [e.pageX, e.pageY];
+    canvasMousePosition = [e.clientX, e.clientY];
 });
 
 var isCntrlClicked = false;
@@ -37,6 +39,7 @@ document.addEventListener("mouseup", (e) => {
 document.addEventListener("mousemove", (e) => {
     // console.log(isClickHoldsOnDocument);
     if (isClickHoldsOnDocument) {
+        backUpdate();
         window.scrollBy(-e.movementX, -e.movementY);
         scrollingBounder.style.left = window.scrollX + "px";
         scrollingBounder.style.top = window.scrollY + "px";
@@ -53,13 +56,13 @@ document.addEventListener("blur", () => {
 document.addEventListener("mousedown", (e) => {
     if (e.buttons == 1 && isShiftClicked) {
         selectionSquare.min = [mousePosition[0], mousePosition[1]];
-        selectionSquare.max = [e.clientX - selectionSquare.min[0], e.clientY - selectionSquare.min[1]];
+        selectionSquare.max = [e.pageX - selectionSquare.min[0], e.pageY - selectionSquare.min[1]];
         selectionSquare.isExist = true;
     }
 });
 document.addEventListener("mousemove", (e) => {
     if (e.buttons == 1 && isShiftClicked) {
-        selectionSquare.max = [e.clientX - selectionSquare.min[0], e.clientY - selectionSquare.min[1]];
+        selectionSquare.max = [e.pageX - selectionSquare.min[0], e.pageY - selectionSquare.min[1]];
     }
 });
 document.addEventListener("mouseup", (e) => {
@@ -76,7 +79,7 @@ var save1req = window.indexedDB.open("Save 1", 1);
 var save1DB;
 save1req.onsuccess = function (e) {
     save1DB = save1req.result;
-    console.log(e);
+    // console.log(e);
 }
 save1req.onupgradeneeded = function (e) {
     save1DB = e.target.result

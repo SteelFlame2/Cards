@@ -10,7 +10,8 @@ var cardCreator = {
 function copyDataToCreator(Card) {
     let data = Card.getCardData();
     cardCreator.HeaderInput.value = data[0];
-    console.log(data);
+    HeaderName = data[0];
+    // console.log(data);
     for (let i = 0; i < data[1].length; i++) {
         if (data[1][i].Type == "Span") {
             addCreateRemindText(data[1][i].data);
@@ -39,29 +40,19 @@ function addCreateRemindText(value) {
     newTextRemind.appendChild(deleteButton);
     let BR = document.createElement("br");
     BR.className = "toCreate toDelete";
-    if (cardCreator.contentDom.lastElementChild.nodeName != "SCRIPT") {
+    if (cardCreator.contentDom.lastElementChild.nodeName != "INPUT") {
         cardCreator.contentDom.appendChild(BR);
     }
     cardCreator.contentDom.appendChild(newTextRemind);
 }
-function addCreatorTaskToTaskList(value, tragetUL) {
+function addCreatorTaskToTaskList(value, targetUL) {
     let newLi = document.createElement("li");
     newLi.innerHTML += "<span class='taskText'>" + value + "</span>";
     let newCompletenessButton = document.createElement("img");
     newCompletenessButton.src = "Images/UncompleteTask.svg";
     newCompletenessButton.className = "completenessSvg";
     newCompletenessButton.classList.add("uncomplete");
-    newCompletenessButton.addEventListener("mousedown", (e) => {
-        if (e.buttons == 1) {
-            if (newCompletenessButton.classList[1] == "uncomplete") {
-                newCompletenessButton.src = "Images/CompleteTask.svg";
-                newCompletenessButton.classList.replace("uncomplete", "complete");
-            } else {
-                newCompletenessButton.src = "Images/UncompleteTask.svg";
-                newCompletenessButton.classList.replace("complete", "uncomplete");
-            }
-        }
-    });
+
     newLi.appendChild(newCompletenessButton);
 
     let TaskDeleteButton = document.createElement("input");
@@ -73,7 +64,7 @@ function addCreatorTaskToTaskList(value, tragetUL) {
     });
     newLi.appendChild(TaskDeleteButton);
 
-    tragetUL.appendChild(newLi);
+    targetUL.appendChild(newLi);
 }
 function addCreatorTaskList(name) {
     let ulMain = document.createElement("ul");
@@ -129,7 +120,9 @@ cardCreator.CreateNewStickButton.addEventListener("click", (e) => {
     while (toPreDeleteElements.length > 0) {
         toPreDeleteElements[0].remove();
     }
-    createNewStick(HeaderName, toCreateElements);
+    let newNode = createNewStick(HeaderName, toCreateElements);
+    newNode.style.left = cardCreator.dom.style.left;
+    newNode.style.top = cardCreator.dom.style.top;
 
     let toDeleteElements = cardCreator.dom.getElementsByClassName("toDelete");
     while (toDeleteElements.length > 0) {
