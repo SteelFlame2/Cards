@@ -1,5 +1,5 @@
 var contextMenuDocumentDom = document.getElementById("document-context-menu");
-var lastConextMenuCallPosition = [0, 0];
+var lastContextMenuCallPosition = [0, 0];
 
 var contexLineDeleter = document.getElementById("delete-line");
 var cardEditor = document.getElementById("card-editor");
@@ -20,7 +20,7 @@ document.addEventListener("contextmenu", (e) => {
     setContextMenuVisibility(1);
     contextMenuDocumentDom.style.left = e.clientX + "px";
     contextMenuDocumentDom.style.top = e.clientY + "px";
-    lastConextMenuCallPosition = [e.pageX, e.pageY];
+    lastContextMenuCallPosition = [e.clientX, e.clientY];
 
     let hover = findHoveredLineInPoint(e.clientX, e.clientY);
     if (hover[0]) {
@@ -33,7 +33,7 @@ document.addEventListener("contextmenu", (e) => {
 
     let isOnCard = false;
     for (let i = 0; i < Cards.length; i++) {
-        if (Cards[i].isPointOnCard(lastConextMenuCallPosition[0], lastConextMenuCallPosition[1])) {
+        if (Cards[i].isPointOnCard(lastContextMenuCallPosition[0], lastContextMenuCallPosition[1])) {
             pointedCard = Cards[i];
             isOnCard = true;
         }
@@ -51,7 +51,7 @@ document.addEventListener("mousedown", (e) => {
 });
 
 contexLineDeleter.addEventListener("click", (e) => {
-    let hover = findHoveredLineInPoint(lastConextMenuCallPosition);
+    let hover = findHoveredLineInPoint(lastContextMenuCallPosition);
     if (hover[0]) {
         deleteLine(hover[1]);
     }
@@ -63,8 +63,13 @@ cardEditor.addEventListener("click", (e) => {
 });
 
 weightsUpdater.addEventListener("click", (e => {
-    mainLine = findHoveredLineInPoint(lastConextMenuCallPosition)[1];
-    setThickness();
+    let hover = findHoveredLineInPoint(lastContextMenuCallPosition);
+    if (hover[0]) {
+        mainLine = hover[1];
+        setThickness();
+    } else {
+        console.log("Not hovered");
+    }
     mainLine = -1;
     setContextMenuVisibility(0);
 }));

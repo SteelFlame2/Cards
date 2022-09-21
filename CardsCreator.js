@@ -1,5 +1,5 @@
 var cardCreator = {
-    dom: document.getElementById("creatingCard"),
+    dom: document.getElementById("creating-card"),
     contentDom: document.getElementById("content"),
     HeaderInput: document.getElementById("HeaderNameInput"),
     RemindTextInput: document.getElementById("RemindTextInput"),

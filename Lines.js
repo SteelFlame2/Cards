@@ -1,3 +1,5 @@
+let canv = document.getElementById("canvas");
+let ctx = canv.getContext("2d");
 
 function magnitude(a) {
     return Math.sqrt((a[0] ** 2) + (a[1] ** 2));
@@ -40,7 +42,7 @@ onLineHoveredFuncs.push((line) => {
     ctx.fillText("Thick: " + line.thickness, canvasMousePosition[0], canvasMousePosition[1] - 16);
 });
 class Line {
-    constructor(card1 = undefined, card2 = undefined, id = -1) {
+    constructor(card1 = undefined, card2 = undefined, id = -1, Thickness = 1) {
         this.id = id;
 
         this.card1 = card1;
@@ -49,7 +51,7 @@ class Line {
         this.dom1 = this.card1.cardDOM;
         this.dom2 = this.card2.cardDOM;
 
-        this.thickness = 1;
+        this.thickness = Thickness;
         this.hovered = false;
 
         document.addEventListener("mousemove", (e) => {
@@ -178,16 +180,12 @@ function findHoveredLineInPoint(x, y) {
             return [true, i];
         }
     }
-    return [false];
+    return [false, -1];
 }
 var mainLine = -1;
 function setThickness(StartLines = findFirstLines()) {
-    if (mainLine == -1) {
-        StartLines = findFirstLines();
-    } else {
-        StartLines = [Lines[mainLine]];
-        Lines[mainLine].thickness = 1;
-    }
+    StartLines = [Lines[mainLine]];
+    Lines[mainLine].thickness = 1;
     if (Lines.length == 0) {
         console.log("Lines length = 0");
         return;

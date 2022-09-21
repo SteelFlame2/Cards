@@ -144,7 +144,7 @@ function loadData(path) {
             createNewStick(e.target.result[i].Header, newContent, e.target.result[i].Position);
         }
         for (let i = 0; i < newLinesToPush.length; i++) {
-            Lines.push(new Line(Cards[newLinesToPush[i].firstCardIndex], Cards[newLinesToPush[i].secondCardIndex], Lines.length));
+            Lines.push(new Line(Cards[newLinesToPush[i].firstCardIndex], Cards[newLinesToPush[i].secondCardIndex], Lines.length, newLinesToPush[i].thick));
         }
     }
     newLines.onsuccess = function (e) {
@@ -152,7 +152,7 @@ function loadData(path) {
             if (Cards.length <= 1) {
                 newLinesToPush.push(e.target.result[i]);
             } else {
-                Lines.push(new Line(Cards[e.target.result[i].firstCardIndex], Cards[e.target.result[i].secondCardIndex], Lines.length));
+                Lines.push(new Line(Cards[e.target.result[i].firstCardIndex], Cards[e.target.result[i].secondCardIndex], Lines.length, e.target.result[i].thick));
             }
         }
     }

@@ -1,6 +1,4 @@
-let canv = document.getElementById("canvas");
 let bgCanv = document.getElementById("background-canvas");
-let ctx = canv.getContext("2d");
 let bg = bgCanv.getContext("webgl");
 
 canv.width = window.innerWidth;

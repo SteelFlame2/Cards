@@ -10,7 +10,10 @@
     cursor: default;
     font-family: HandDraw;
     font-weight: 600;
-    font-size: 17px;
+    font-size: 18px;
+}
+#creating-card {
+    width: 280px;
 }
 
 .card hr {
@@ -73,7 +76,8 @@ input[type="button"],
 textarea {
     background: none;
     border: none;
-    font-size: 16px;
+    font-size: 19px;
+    width: 100%;
 }
 
 .card input[type="text"] {

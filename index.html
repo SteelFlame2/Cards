@@ -32,7 +32,7 @@
     <div id="scrolling-bounds"></div>
     <canvas id="background-canvas">Browser don't support webgl</canvas>
     <canvas id="canvas"></canvas>
-    <div id="creatingCard" class="card">
+    <div id="creating-card" class="card">
         <div id="header">
             <div id="text">
                 <input id="HeaderNameInput" type="text" placeholder="Header"
@@ -48,7 +48,7 @@
         <hr>
         <div id="content">
             <input id="RemindTextInput" type="text" placeholder="Write text to remind"
-                style="border-bottom: 1px dashed #4DCA33" cols="21" rows="3">
+                style="border-bottom: 1px dashed #4DCA33">
 
             <input id="TaskListNameInput" type="text" placeholder="Create list of tasks(Name here)"
                 style="border-bottom: 1px dashed #679DCA">
@@ -72,6 +72,7 @@
             <li class="toggle-off" id="background-state">Turn off background</li>
         </ul>
     </div>
+    <script src="Lines.js"></script>
     <script src="ContextMenu.js"></script>
     <script src="Miscellaneous.js"></script>
 
@@ -392,7 +393,6 @@
             //gl_FragColor = vec4(colors[minI],.5);
         }
     </script>
-    <script src="Lines.js"></script>
     <script src="Canvas.js"></script>
 </body>
 
