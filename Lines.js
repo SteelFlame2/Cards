@@ -182,10 +182,8 @@ function findHoveredLineInPoint(x, y) {
     }
     return [false, -1];
 }
-var mainLine = -1;
-function setThickness(StartLines = findFirstLines()) {
-    StartLines = [Lines[mainLine]];
-    Lines[mainLine].thickness = 1;
+function executeForLinesTree(_StartLines, FuncForLines = (index, line) =>{}) {
+    let StartLines = _StartLines;
     if (Lines.length == 0) {
         console.log("Lines length = 0");
         return;
@@ -206,16 +204,31 @@ function setThickness(StartLines = findFirstLines()) {
             }
         }
         for (let i = 0; i < comparedLast.length; i++) {
-            comparedLast[i].thickness = Math.max(nominalLength - ind * 1.2, 1);
-            // console.log(ind + ": " + comparedLast[i].card1.id + ", " + comparedLast[i].card2.id);
+            FuncForLines(ind, comparedLast[i]);
         }
         if (comparedLast.length == 0) break;
         last = findConnectedLines(comparedLast, exceptions);
         ind++;
     }
+}
+var mainLine = -1;
+function setThickness(StartLines = findFirstLines()) {
+    StartLines = [Lines[mainLine]];
+    Lines[mainLine].thickness = 1;
+    executeForLinesTree(StartLines,(ind,line)=>{
+        line.thickness = Math.max(nominalLength - ind * 1.2, 1);
+    });
     if (mainLine != -1)
         Lines[mainLine].thickness = nominalLength;
 }
+
+document.addEventListener("wheel", (e)=>{
+    let hover = findHoveredLineInPoint(e.clientX,e.clientY);
+    if (hover[0]) {
+        nominalLength += 1 * -e.deltaY/100;
+        Lines[hover[1]].thickness = nominalLength;
+    }
+});
 
 function update() {
     ctx.fillStyle = "black";

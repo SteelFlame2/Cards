@@ -15,7 +15,7 @@ window.onresize = function (e) {
 }
 
 let haveBackgroundNoise = false;
-let isBackgroundTurned = true;
+let isBackgroundTurned = false;
 
 function initShaders(gl, vs_source, fs_source) {
     // Compile shaders

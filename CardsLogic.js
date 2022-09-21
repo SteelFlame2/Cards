@@ -9,11 +9,94 @@ function restartSelectionLostTimer() {
         selectedCard1 = -1;
     }, 2 * 1000);
 }
+class DeleteAction {
+    constructor(Header, Content, Position) {
+        this.header = Header;
+        this.content = Content;
+        this.position = Position;
+    }
+    Backup() {
+        // if ()
+        let domContent = [];
+        for (let i = 0; i < this.content.length; i++) {
+            if (this.content[i].Type == "Span"){ 
+                domContent.push(createTextReminder(this.content[i].data));
+            } else if (this.content[i].Type == "List") {
+                let listOfTasks = [];
+                for (let j = 0; j < this.content[i].data.length; j++) {
+                    listOfTasks.push(this.content[i].data[j]);
+                }
+                domContent.push(createListOfTasks(this.content[i].name,listOfTasks));
+            }
+        }
+        createNewStick(this.header, domContent, this.position);
+    }
+}
+var actionsHistory = [];
+addFewKeyPressEvent(["KeyZ","ControlLeft"],()=>{
+    if (actionsHistory.length > 0) {
+        actionsHistory[actionsHistory.length-1].Backup();
+        actionsHistory.splice(actionsHistory.length-1,1);
+    }
+});
+addFewKeyPressEvent(["KeyF","ControlLeft"],()=>{
+    let searchTarget = prompt("Search header");
+    let headers = [];
+    for (let i = 0; i < Cards.length; i++) {
+        headers.push(Cards[i].getCardData()[0]);
+    }
+    let search = searchText(searchTarget,headers);
+    Cards[search[1][0].from].Select();
+    let cardDom = Cards[search[1][0].from].cardDOM;
+    window.scrollTo(
+        Number(cardDom.style.left.slice(0,-2)) - window.innerWidth/2,
+        Number(cardDom.style.top.slice(0,-2)) - window.innerHeight/2);
+
+});
+
+function searchText(targetText, toFindTexts) {
+    let scores = [];
+    for (let i = 0; i < toFindTexts.length; i++) {
+        scores[i] = {value: 0, ind: i};
+        let sameLettersCount = 0;
+        let sameLetters = [];
+        for (let j = 0; j < targetText.length; j++) {
+            sameLetters[j] = [];
+            for (let k = 0; k < toFindTexts[i].length; k++) {
+                if (targetText[j] == toFindTexts[i][k]) {
+                    sameLettersCount++;
+                    sameLetters[j].push({
+                        pos1: j,
+                        pos2: k,
+                        letter: targetText[j]
+                    });
+                }
+            }
+        }
+        if (sameLettersCount >= 2) {
+            for (let j = 0; j < sameLetters.length; j++) {
+                for (let k = 0; k < sameLetters[j].length; k++) {
+                    scores[i].value += 1/(1+Math.sqrt(Math.pow(sameLetters[j][k].pos2-sameLetters[j][k].pos1,2)));   
+                }
+            }
+        }
+    }
+    scores = scores.sort((a,b)=>{return b.value-a.value});
+    let sortedTexts = [];
+    let sortDirection = [];
+    for (let i = 0; i < scores.length; i++) {
+        sortedTexts.push(toFindTexts[scores[i].ind]);
+        sortDirection.push({from:scores[i].ind, to:i});
+    }
+    return [sortedTexts,sortDirection];
+}
+
 var isSomeCardClicked = false;
 class Card {
     constructor(id = -1, CardDOM) {
         this.id = id;
         this.cardDOM = CardDOM;
+        this.data = this.getCardData();
 
         this.clickOffset = [0, 0];
         this.isClicked = false;
@@ -106,15 +189,19 @@ class Card {
         let closer = this.cardDOM.getElementsByClassName("closer");
         if (closer.length > 0) {
             closer[0].addEventListener("mousedown", (e) => {
+                actionsHistory.push(new DeleteAction(this.data[0], this.data[1], this.data[2]));
                 let linesToDelete = [];
                 for (let i = 0; i < Lines.length; i++) {
                     if (Lines[i].card1 == this || Lines[i].card2 == this) {
                         linesToDelete.push(i);
                     }
                 }
-                for (let i = 0; i < linesToDelete.length; i++) {
-                    deleteLine(linesToDelete[i]);
+                let newLines = [];
+                for (let i = 0; i < Lines.length; i++) {
+                    if (!linesToDelete.includes(i)) newLines.push(Lines[i]);
+                    // deleteLine(linesToDelete[i]);
                 }
+                Lines = newLines;
                 for (let i = this.id + 1; i < Cards.length; i++) {
                     Cards[i].id -= 1;
                 }
@@ -124,6 +211,23 @@ class Card {
                 return;
             });
         }
+        this.cardDOM.addEventListener("dblclick",(e)=>{
+            
+            executeForLinesTree(this.findConnectedLines(),(ind,line)=>{
+                line.card1.Select();
+                line.card2.Select();
+            });
+        });
+    }
+    findConnectedLines() {
+        if (Lines.length == 0) return [];
+        let connectedLines = [];
+        for (let i = 0; i < Lines.length; i++) {
+            if (Lines[i].card1 == this || Lines[i].card2 == this) {
+                connectedLines.push(Lines[i]);
+            }
+        }
+        return connectedLines;
     }
     Select() {
         this.isSelected = true;

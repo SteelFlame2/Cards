@@ -1,29 +1,3 @@
-// Usefull data
-var mousePosition = [0, 0];
-var canvasMousePosition = [0, 0];
-document.addEventListener("mousemove", (e) => {
-    mousePosition = [e.pageX, e.pageY];
-    canvasMousePosition = [e.clientX, e.clientY];
-});
-
-var isCntrlClicked = false;
-var isShiftClicked = false;
-document.addEventListener("keydown", (e) => {
-    if (e.code == "ControlLeft") {
-        isCntrlClicked = true;
-    }
-    if (e.code == "ShiftLeft") {
-        isShiftClicked = true;
-    }
-});
-document.addEventListener("keyup", (e) => {
-    if (e.code == "ControlLeft") {
-        isCntrlClicked = false;
-    }
-    if (e.code == "ShiftLeft") {
-        isShiftClicked = false;
-    }
-});
 // Window scroll as drag
 var scrollingBounder = document.getElementById("scrolling-bounds");
 

@@ -77,7 +77,7 @@ textarea {
     background: none;
     border: none;
     font-size: 19px;
-    width: 100%;
+    /* width: 95%; */
 }
 
 .card input[type="text"] {
