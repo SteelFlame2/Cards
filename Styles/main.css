@@ -11,3 +11,51 @@ body {
     font-size: 16px;
     overflow: hidden;
 }
+
+.URLImage {
+    width:100%;
+}
+
+#searchTab {
+    position: fixed;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    z-index: 1;
+    background-color: rgba(40,40,40,0.7);
+    display:flex;
+    align-items: center;
+    flex-direction: column;
+    font-size: 20px;
+
+    display:none;
+}
+#searchTab #searchTab-target {
+    margin-top: 200px;
+    margin-bottom: 50px;
+}
+#searchTab #searchTab-target-input {
+    border: none;
+    background-color: rgb(220, 220, 220);
+    width: 800px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 25px;
+    text-align:center;
+}
+#searchTab #searchTab-recomendations {
+    width: 800px;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    text-align:center;
+}
+#searchTab .searchTab-recomendation {
+    border-bottom: 1px solid rgb(220,220,220);
+    width:100%;
+    padding: 10px 0px;
+}
+#searchTab .searchTab-recomendation:hover {
+    background: rgba(199, 199, 199, 0.2);
+}

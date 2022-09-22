@@ -53,7 +53,6 @@ var save1req = window.indexedDB.open("Save 1", 1);
 var save1DB;
 save1req.onsuccess = function (e) {
     save1DB = save1req.result;
-    // console.log(e);
 }
 save1req.onupgradeneeded = function (e) {
     save1DB = e.target.result
@@ -61,9 +60,19 @@ save1req.onupgradeneeded = function (e) {
     save1DB.createObjectStore("Lines", { autoIncrement: true });
 }
 
+var backupReq = window.indexedDB.open("Backup", 1);
+var backupDB;
+backupReq.onsuccess = function (e) {
+    backupDB = backupReq.result;
+}
+backupReq.onupgradeneeded = function (e) {
+    backupDB = e.target.result
+    backupDB.createObjectStore("Cards", { autoIncrement: true });
+    backupDB.createObjectStore("Lines", { autoIncrement: true });
+}
 
-function addCardsToTable(path) {
-    let CardsTrans = save1DB.transaction("Cards", "readwrite");
+function addCardsToTable(path, DB = save1DB) {
+    let CardsTrans = DB.transaction("Cards", "readwrite");
     let CardsTable = CardsTrans.objectStore("Cards");
     CardsTable.clear();
     for (let i = 1; i < Cards.length; i++) {
@@ -71,20 +80,20 @@ function addCardsToTable(path) {
         CardsTable.add({ Header: data[0], Content: data[1], Position: data[2] });
     }
 }
-function addLinesToTable(path) {
-    let LinesTrans = save1DB.transaction("Lines", "readwrite");
+function addLinesToTable(path, DB = save1DB) {
+    let LinesTrans = DB.transaction("Lines", "readwrite");
     let LinesTable = LinesTrans.objectStore("Lines");
     LinesTable.clear();
     for (let i = 0; i < Lines.length; i++) {
         LinesTable.add(Lines[i].getLineData());
     }
 }
-function saveData(path) {
-    addCardsToTable(path);
-    addLinesToTable(path);
+function saveData(path, DB = save1DB) {
+    addCardsToTable(path,DB);
+    addLinesToTable(path,DB);
 }
 var newLinesToPush = [];
-function loadData(path) {
+function loadData(path, DB = save1DB) {
     Cards.splice(1, Cards.length - 1);
     Lines.splice(0, Lines.length);
 
@@ -95,9 +104,9 @@ function loadData(path) {
         cards[1].remove();
     }
 
-    let CardsTrans = save1DB.transaction("Cards", "readonly");
+    let CardsTrans = DB.transaction("Cards", "readonly");
     let CardsTable = CardsTrans.objectStore("Cards");
-    let LinesTrans = save1DB.transaction("Lines", "readonly");
+    let LinesTrans = DB.transaction("Lines", "readonly");
     let LinesTable = LinesTrans.objectStore("Lines");
 
     let newCards = CardsTable.getAll();
@@ -139,4 +148,5 @@ window.onbeforeunload = function () {
 window.onload = function () {
     loadData();
     isWindowLoaded = true;
+    resetRecomendations();
 }

@@ -26,14 +26,19 @@
             height: 110%;
         }
     </style>
+    <div id="searchTab">
+        <div id="searchTab-target"><input id="searchTab-target-input" type="text"></div>
+        <div id="searchTab-recomendations">
+        </div>
+    </div>
+    <script src="Navigation.js"></script>
     <div id="scrolling-bounds"></div>
     <canvas id="background-canvas">Browser don't support webgl</canvas>
     <canvas id="canvas"></canvas>
     <div id="creating-card" class="card">
         <div id="header">
             <div id="text">
-                <input id="HeaderNameInput" type="text" placeholder="Header"
-                    onchange="HeaderName = HeaderNameInput.value">
+                <input id="HeaderNameInput" type="text" placeholder="Header" onchange="HeaderName = HeaderNameInput.value">
                 <script>
                     let HeaderNameInput = document.getElementById("HeaderNameInput");
                 </script>

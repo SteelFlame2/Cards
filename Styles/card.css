@@ -15,6 +15,9 @@
 #creating-card {
     width: 280px;
 }
+.linkedTextReminder {
+    display:none;
+}
 
 .card hr {
     border: 1px solid rgb(173, 178, 15);

@@ -39,57 +39,9 @@ addFewKeyPressEvent(["KeyZ","ControlLeft"],()=>{
         actionsHistory.splice(actionsHistory.length-1,1);
     }
 });
-addFewKeyPressEvent(["KeyF","ControlLeft"],()=>{
-    let searchTarget = prompt("Search header");
-    let headers = [];
-    for (let i = 0; i < Cards.length; i++) {
-        headers.push(Cards[i].getCardData()[0]);
-    }
-    let search = searchText(searchTarget,headers);
-    Cards[search[1][0].from].Select();
-    let cardDom = Cards[search[1][0].from].cardDOM;
-    window.scrollTo(
-        Number(cardDom.style.left.slice(0,-2)) - window.innerWidth/2,
-        Number(cardDom.style.top.slice(0,-2)) - window.innerHeight/2);
-
+addFewKeyPressEvent(["Escape"], ()=>{
+    searchTab.style.display = "none";
 });
-
-function searchText(targetText, toFindTexts) {
-    let scores = [];
-    for (let i = 0; i < toFindTexts.length; i++) {
-        scores[i] = {value: 0, ind: i};
-        let sameLettersCount = 0;
-        let sameLetters = [];
-        for (let j = 0; j < targetText.length; j++) {
-            sameLetters[j] = [];
-            for (let k = 0; k < toFindTexts[i].length; k++) {
-                if (targetText[j] == toFindTexts[i][k]) {
-                    sameLettersCount++;
-                    sameLetters[j].push({
-                        pos1: j,
-                        pos2: k,
-                        letter: targetText[j]
-                    });
-                }
-            }
-        }
-        if (sameLettersCount >= 2) {
-            for (let j = 0; j < sameLetters.length; j++) {
-                for (let k = 0; k < sameLetters[j].length; k++) {
-                    scores[i].value += 1/(1+Math.sqrt(Math.pow(sameLetters[j][k].pos2-sameLetters[j][k].pos1,2)));   
-                }
-            }
-        }
-    }
-    scores = scores.sort((a,b)=>{return b.value-a.value});
-    let sortedTexts = [];
-    let sortDirection = [];
-    for (let i = 0; i < scores.length; i++) {
-        sortedTexts.push(toFindTexts[scores[i].ind]);
-        sortDirection.push({from:scores[i].ind, to:i});
-    }
-    return [sortedTexts,sortDirection];
-}
 
 var isSomeCardClicked = false;
 class Card {
@@ -208,11 +160,11 @@ class Card {
 
                 Cards.splice(this.id, 1);
                 this.cardDOM.remove();
+                deleteRecomendation(this.data[0]);
                 return;
             });
         }
         this.cardDOM.addEventListener("dblclick",(e)=>{
-            
             executeForLinesTree(this.findConnectedLines(),(ind,line)=>{
                 line.card1.Select();
                 line.card2.Select();
@@ -244,7 +196,7 @@ class Card {
         let ContentChildrens = this.cardDOM.children[2].children;
         for (let i = 0; i < ContentChildrens.length; i++) {
             if (ContentChildrens[i].tagName == "SPAN") {
-                ContentData.push({ Type: "Span", data: ContentChildrens[i].innerText });
+                ContentData.push({ Type: "Span", data: ContentChildrens[i].firstChild.innerText });
             } else if (ContentChildrens[i].tagName == "UL") {
                 let ListTasks = [];
                 for (let j = 0; j < ContentChildrens[i].children.length; j++) {
@@ -329,8 +281,24 @@ function createListOfTasks(ListName, Tasks) { // Just array of strings with task
 }
 function createTextReminder(Text) {
     let Span = document.createElement("span");
-    Span.innerHTML = Text;
+    let textSpan = document.createElement("span");
+    textSpan.innerHTML = Text;
     Span.className = "textReminder";
+    Span.appendChild(textSpan);
+    try {
+        let url = new URL(Text);
+        let link = document.createElement("a");
+        if (true) {
+            let img = document.createElement("img");
+            img.src = Text;
+            img.className = "URLImage";
+            img.alt = Text;
+            link.href = Text;
+            link.appendChild(img);
+        }
+        Span.appendChild(link);
+        textSpan.className = "linkedTextReminder";
+    } catch (err) {}
     return Span;
 }
 function createNewStick(Header, Content, Offset = [Math.random() * (window.clientWidth - 200), Math.random() * (window.clientHeight - 200)]) {
@@ -361,6 +329,8 @@ function createNewStick(Header, Content, Offset = [Math.random() * (window.clien
 
     let newNode = document.body.appendChild(cardDom);
     Cards.push(new Card(Cards.length, cardDom));
+
+    addRecomendation(Header);
 
     return newNode;
 }
