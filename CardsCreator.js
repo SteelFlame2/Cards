@@ -4,7 +4,8 @@ var cardCreator = {
     HeaderInput: document.getElementById("HeaderNameInput"),
     RemindTextInput: document.getElementById("RemindTextInput"),
     TaskListNameInput: document.getElementById("TaskListNameInput"),
-    CreateNewStickButton: document.getElementById("CreateNewStickButton")
+    CreateNewStickButton: document.getElementById("CreateNewStickButton"),
+    HeaderDate: document.getElementById("HeaderDate")
 };
 
 function copyDataToCreator(Card) {

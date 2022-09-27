@@ -96,3 +96,9 @@ textarea {
 .nodeActionButton {
     color: #CA0000;
 }
+
+.card.deleting {
+    transition: 0.5s;
+    transform: scale(2);
+    opacity:0;
+}

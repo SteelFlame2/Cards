@@ -131,7 +131,10 @@ function getColors(count, min, max) {
 
 let passedTime;
 
-initShaders(bg, document.getElementById('shaderVs').text, document.getElementById('shaderFs').text);
+function backUpdate() {
+    return;
+}
+/*initShaders(bg, document.getElementById('shaderVs').text, document.getElementById('shaderFs').text);
 bg.clearColor(0, 0, 0, 1);
 function backUpdate() {
     let startTime = new Date();
@@ -145,4 +148,4 @@ function backUpdate() {
     bg.finish()
     passedTime = new Date() - startTime;
 }
-backUpdate();
+backUpdate();*/

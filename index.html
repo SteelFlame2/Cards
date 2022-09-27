@@ -27,8 +27,27 @@
         }
     </style>
     <div id="searchTab">
+        <div id="searchTab-help">
+            <!-- <ul>
+                <li>
+                    test
+                </li>
+            </ul> -->
+            * L/M/R MB - Left/Middle/Right Mouse Button<br/>
+            Double LMB on card -> select all tree of cards <br/>
+            LShift + LMB drag -> selection square<br/>
+            LCntrl + LMB on multiple card -> select this cards<br/>
+            Shift + F -> Search group by header + help<br/>
+            MMB on cards -> create lines between<br/>
+            You can add link on image in text remind -> card will show image from this link<br/>
+            RMB on card/empty space/line -> context menu<br/>
+            LCntrl + Z -> backup card delete<br/>
+            LShift + S -> Save (Recommended to click regulary)<br/>
+            Scroll when mouse hover line and scroll -> change nominal line width
+        </div>
+
         <div id="searchTab-target"><input id="searchTab-target-input" type="text"></div>
-        <div id="searchTab-recomendations">
+        <div id="searchTab-recomendations" style="overflow: auto">
         </div>
     </div>
     <script src="Navigation.js"></script>
@@ -37,12 +56,11 @@
     <canvas id="canvas"></canvas>
     <div id="creating-card" class="card">
         <div id="header">
-            <div id="text">
                 <input id="HeaderNameInput" type="text" placeholder="Header" onchange="HeaderName = HeaderNameInput.value">
+                <input id="HeaderDate" type="button" value="D">
                 <script>
                     let HeaderNameInput = document.getElementById("HeaderNameInput");
                 </script>
-            </div>
             <!-- <div class="closer">
                 <img src="Images/close.svg" alt="Close">
             </div> -->
@@ -78,7 +96,7 @@
     <script src="ContextMenu.js"></script>
     <script src="Miscellaneous.js"></script>
 
-    <script id="shaderVs" type="x-shader/x-vertex">
+    <!-- <script id="shaderVs" type="x-shader/x-vertex">
         attribute vec4 a_Position;
         void main() {
             gl_Position = a_Position;
@@ -394,7 +412,7 @@
             }
             //gl_FragColor = vec4(colors[minI],.5);
         }
-    </script>
+    </script> -->
     <script src="Canvas.js"></script>
 </body>
 

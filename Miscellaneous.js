@@ -142,11 +142,17 @@ function loadData(path, DB = save1DB) {
 }
 var isWindowLoaded = false;
 window.onbeforeunload = function () {
-    if (isWindowLoaded)
+    if (isWindowLoaded) {
         saveData();
+        console.log("save");
+    }
 }
 window.onload = function () {
     loadData();
     isWindowLoaded = true;
     resetRecomendations();
 }
+addFewKeyPressEvent(["KeyS","ShiftLeft"],()=>{
+    saveData();
+    console.log("save");
+});

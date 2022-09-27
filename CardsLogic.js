@@ -154,13 +154,16 @@ class Card {
                     // deleteLine(linesToDelete[i]);
                 }
                 Lines = newLines;
-                for (let i = this.id + 1; i < Cards.length; i++) {
-                    Cards[i].id -= 1;
-                }
+                this.cardDOM.className += " deleting";
+                setTimeout(()=>{
+                    for (let i = this.id + 1; i < Cards.length; i++) {
+                        Cards[i].id -= 1;
+                    }
 
-                Cards.splice(this.id, 1);
-                this.cardDOM.remove();
-                deleteRecomendation(this.data[0]);
+                    Cards.splice(this.id, 1);
+                    this.cardDOM.remove();
+                    deleteRecomendation(this.data[0]);
+                },500);
                 return;
             });
         }

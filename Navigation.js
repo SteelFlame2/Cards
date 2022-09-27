@@ -85,10 +85,10 @@ searchTabInput.onchange = (e)=>{
     
 };
 
-function createRecomendationDiv(text, id=0) {
+function createRecomendationDiv(text, count, id=0) {
     let mainDiv = document.createElement("div");
     mainDiv.className = "searchTab-recomendation " + id;
-    mainDiv.innerHTML = text;
+    mainDiv.innerHTML = text; // + " " + count
     mainDiv.addEventListener("mousedown",(e)=>{
         let targetIndex = 0;
         for (let i = 0; i < Cards.length; i++) {
@@ -132,6 +132,7 @@ function deleteRecomendation(header) {
             break;
         }
     }
+    if (targetIndex == -1) return;
     if (searchHeaders[targetIndex].count == 1) {
         searchHeaders.splice(targetIndex,1);
         searchTabRecomends.getElementsByClassName("searchTab-recomendation")[targetIndex].remove();
