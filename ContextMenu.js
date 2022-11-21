@@ -26,9 +26,11 @@ document.addEventListener("contextmenu", (e) => {
     if (hover[0]) {
         contexLineDeleter.className = "clickable";
         weightsUpdater.className = "clickable";
+        needLineRedraw = true;
     } else {
         contexLineDeleter.className = "not-clickable";
         weightsUpdater.className = "not-clickable";
+        needLineRedraw = true;
     }
 
     let isOnCard = false;

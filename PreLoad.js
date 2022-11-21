@@ -2,6 +2,7 @@ var HeaderName;
 var Content = [];
 var mousePosition = [0, 0];
 var canvasMousePosition = [0, 0];
+var windowScroll = [0,0];
 
 document.addEventListener("mousemove", (e) => {
     mousePosition = [e.pageX, e.pageY];

@@ -15,6 +15,7 @@ addFewKeyPressEvent(["KeyF","ShiftLeft"],()=>{
         searchTab.style.display = "flex";
     else
         searchTab.style.display = "none";
+    searchTabInput.value = "";
     // let headers = [];
     // for (let i = 0; i < Cards.length; i++) {
     //     headers.push(Cards[i].getCardData()[0]);
@@ -102,6 +103,8 @@ function createRecomendationDiv(text, count, id=0) {
         window.scrollTo(
             Number(cardDom.style.left.slice(0,-2)) - window.innerWidth/2,
             Number(cardDom.style.top.slice(0,-2)) - window.innerHeight/2);
+        needLineRedraw = true;
+        console.log(needLineRedraw);
         searchTab.style.display = "none";
     });
     return mainDiv;

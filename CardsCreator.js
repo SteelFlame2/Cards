@@ -121,7 +121,7 @@ cardCreator.CreateNewStickButton.addEventListener("click", (e) => {
     while (toPreDeleteElements.length > 0) {
         toPreDeleteElements[0].remove();
     }
-    let newNode = createNewStick(HeaderName, toCreateElements);
+    let newNode = createNewStick(cardCreator.HeaderInput.value, toCreateElements);
     newNode.style.left = cardCreator.dom.style.left;
     newNode.style.top = cardCreator.dom.style.top;
 

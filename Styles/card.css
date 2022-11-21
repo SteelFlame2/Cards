@@ -11,9 +11,18 @@
     font-family: HandDraw;
     font-weight: 600;
     font-size: 18px;
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: rgba(255,255,255,0.75);
+    font-size: 19px;
+    width: 330px;
+    color: black;
+    box-shadow: 0px 0px 30px -10px white;
 }
 #creating-card {
     width: 280px;
+
+    width: 330px;
 }
 .linkedTextReminder {
     display:none;
@@ -22,6 +31,8 @@
 .card hr {
     border: 1px solid rgb(173, 178, 15);
     margin: 0;
+
+    border: 1px solid rgba(190,190,190,0.75);
 }
 
 .card #header {
@@ -31,6 +42,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    background-color: rgba(216,216,216,0.65);
 }
 
 .card #header #text {
@@ -80,7 +93,7 @@ textarea {
     background: none;
     border: none;
     font-size: 19px;
-    /* width: 95%; */
+    width: 100%;
 }
 
 .card input[type="text"] {

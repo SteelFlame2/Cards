@@ -14,9 +14,11 @@ document.addEventListener("mousemove", (e) => {
     // console.log(isClickHoldsOnDocument);
     if (isClickHoldsOnDocument) {
         backUpdate();
+        needLineRedraw = true;
         window.scrollBy(-e.movementX, -e.movementY);
         scrollingBounder.style.left = window.scrollX + "px";
         scrollingBounder.style.top = window.scrollY + "px";
+        windowScroll = [window.scrollX, window.scrollY];
     }
     if (e.clientX > window.clientX || e.clientY > window.clientY ||
         e.clientX < 0 || e.clientY < 0) isClickHoldsOnDocument = false;
@@ -53,6 +55,7 @@ var save1req = window.indexedDB.open("Save 1", 1);
 var save1DB;
 save1req.onsuccess = function (e) {
     save1DB = save1req.result;
+    loadData();
 }
 save1req.onupgradeneeded = function (e) {
     save1DB = e.target.result
@@ -129,6 +132,7 @@ function loadData(path, DB = save1DB) {
         for (let i = 0; i < newLinesToPush.length; i++) {
             Lines.push(new Line(Cards[newLinesToPush[i].firstCardIndex], Cards[newLinesToPush[i].secondCardIndex], Lines.length, newLinesToPush[i].thick));
         }
+        needLineRedraw = true;
     }
     newLines.onsuccess = function (e) {
         for (let i = 0; i < e.target.result.length; i++) {
@@ -138,6 +142,7 @@ function loadData(path, DB = save1DB) {
                 Lines.push(new Line(Cards[e.target.result[i].firstCardIndex], Cards[e.target.result[i].secondCardIndex], Lines.length, e.target.result[i].thick));
             }
         }
+        needLineRedraw = true;
     }
 }
 var isWindowLoaded = false;
@@ -146,13 +151,64 @@ window.onbeforeunload = function () {
         saveData();
         console.log("save");
     }
+    return false;
 }
 window.onload = function () {
-    loadData();
+    // loadData();
     isWindowLoaded = true;
     resetRecomendations();
+    needLineRedraw = true;
+}
+
+let popupMessageDOM = document.getElementById("popupPanel");
+let popupMessageDOMText = document.getElementById("popupPanel-message");
+let popupCloseButton = document.getElementById("popupPanel-closebutton");
+popupCloseButton.onclick = (e)=>{
+    popupMessageDOM.className = "";
+    popupMessageDOM.style.display = "none";
+};
+function showPopupMessage(text, timeToShow = 800) {
+    popupMessageDOMText.innerHTML = text;
+    popupMessageDOM.className = "triggered";
+    popupMessageDOM.style.display = "flex";
+    setTimeout(()=>{
+        popupMessageDOM.className = "";
+        setTimeout(()=>{
+            popupMessageDOM.style.display = "none";
+        },300);
+    },timeToShow);
 }
 addFewKeyPressEvent(["KeyS","ShiftLeft"],()=>{
     saveData();
-    console.log("save");
+    showPopupMessage("Saved");
 });
+addFewKeyPressEvent(["KeyH","ShiftLeft"],()=>{
+    showPopupMessage(`
+        LShift + H -> this panel<br/>
+        * L/M/R MB - Left/Middle/Right Mouse Button<br/>
+        Double LMB on card -> select all tree of cards <br/>
+        LShift + LMB drag -> selection square<br/>
+        LCntrl + LMB on multiple card -> select this cards<br/>
+        Shift + F -> Search group by header + help<br/>
+        MMB on cards -> create lines between<br/>
+        You can add link on image in text remind -> card will show image from this link<br/>
+        RMB on card/empty space/line -> context menu<br/>
+        LCntrl + Z -> backup card delete<br/>
+        LShift + S -> Save (Recommended to click regulary)<br/>
+        Scroll when mouse hover line and scroll -> change nominal line width
+    `, 3000);
+});
+showPopupMessage(`
+        LShift + H -> this panel<br/>
+        * L/M/R MB - Left/Middle/Right Mouse Button<br/>
+        Double LMB on card -> select all tree of cards <br/>
+        LShift + LMB drag -> selection square<br/>
+        LCntrl + LMB on multiple card -> select this cards<br/>
+        Shift + F -> Search group by header + help<br/>
+        MMB on cards -> create lines between<br/>
+        You can add link on image in text remind -> card will show image from this link<br/>
+        RMB on card/empty space/line -> context menu<br/>
+        LCntrl + Z -> backup card delete<br/>
+        LShift + S -> Save (Recommended to click regulary)<br/>
+        Scroll when mouse hover line and scroll -> change nominal line width
+    `, 5000);

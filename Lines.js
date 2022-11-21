@@ -17,9 +17,9 @@ function pseudoDot(a, b) {
 
 function getInViewport(x, y) {
     if (Array.isArray(x)) {
-        return [x[0] - window.scrollX, x[1] - window.scrollY];
+        return [x[0] - windowScroll[0], x[1] - windowScroll[1]];
     }
-    return [x - window.scrollX, y - window.scrollY];
+    return [x - windowScroll[0], y - windowScroll[1]];
 }
 
 var nominalLength = 5;
@@ -35,12 +35,6 @@ document.body.addEventListener("mousedown", (e) => {
 var mousePosition = [];
 
 let onLineHoveredFuncs = [];
-onLineHoveredFuncs.push((line) => {
-    ctx.font = "16px Arial";
-    ctx.fillStyle = "rgb(0,255,0)";
-    ctx.fillText("ID: " + line.id, canvasMousePosition[0], canvasMousePosition[1]);
-    ctx.fillText("Thick: " + line.thickness, canvasMousePosition[0], canvasMousePosition[1] - 16);
-});
 class Line {
     constructor(card1 = undefined, card2 = undefined, id = -1, Thickness = 1) {
         this.id = id;
@@ -57,40 +51,34 @@ class Line {
         document.addEventListener("mousemove", (e) => {
             if (this.isHovered(e.clientX, e.clientY)) {
                 this.hovered = true;
+                for (let i = 0; i < onLineHoveredFuncs.length; i++) {
+                    onLineHoveredFuncs[i](this);
+                }
+                needLineRedraw = true;
             } else {
                 this.hovered = false;
             }
         });
     }
     draw() {
-        if (mainLine == this.id)
-            ctx.strokeStyle = "Yellow";
-        else
-            ctx.strokeStyle = "White";
-        ctx.lineWidth = this.thickness;
-        let p1 = getInViewport([this.dom1.offsetLeft + this.dom1.clientWidth / 2, this.dom1.offsetTop]);
-        let p2 = getInViewport([this.dom2.offsetLeft + this.dom2.clientWidth / 2, this.dom2.offsetTop]);
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = this.thickness;//Number(Cards[5].cardDOM.style.left.slice(0,-2))
+        let p1 = getInViewport([Number(this.dom1.style.left.slice(0,-2)) + this.dom1.clientWidth / 2, Number(this.dom1.style.top.slice(0,-2))]);
+        let p2 = getInViewport([Number(this.dom2.style.left.slice(0,-2)) + this.dom2.clientWidth / 2, Number(this.dom2.style.top.slice(0,-2))]);
 
         ctx.beginPath();
         ctx.moveTo(p1[0], p1[1]);
         ctx.lineTo(p2[0], p2[1]);
         ctx.stroke();
     }
-    update() {
-        if (this.hovered) {
-            for (let i = 0; i < onLineHoveredFuncs.length; i++) {
-                onLineHoveredFuncs[i](this);
-            }
-        }
-    }
     isHovered(mx, my) {
         let delta1 = [
-            (this.dom2.offsetLeft + this.dom2.clientWidth / 2) - (this.dom1.offsetLeft + this.dom1.clientWidth / 2),
-            this.dom2.offsetTop - this.dom1.offsetTop,
+            (Number(this.dom2.style.left.slice(0,-2))  + this.dom2.clientWidth / 2) - (Number(this.dom1.style.left.slice(0,-2)) + this.dom1.clientWidth / 2),
+            Number(this.dom2.style.top.slice(0,-2))  - Number(this.dom1.style.top.slice(0,-2)),
         ];
         let delta2 = [
-            (this.dom1.offsetLeft + this.dom1.clientWidth / 2) - (mx + window.scrollX),
-            this.dom1.offsetTop - (my + window.scrollY),
+            (Number(this.dom1.style.left.slice(0,-2))  + this.dom1.clientWidth / 2) - (mx + window.scrollX),
+            Number(this.dom1.style.top.slice(0,-2))  - (my + window.scrollY),
         ];
         let L = dot(normalize(delta1), [-delta2[0], -delta2[1]]);
         if (Math.abs(pseudoDot(delta2, normalize(delta1))) < 12 &&
@@ -116,6 +104,7 @@ function createNewLine(card1, card2) {
     let newL = Lines.push(new Line(card1, card2, Lines.length));
     card1.connectedLines.push(Lines[newL - 1]);
     card2.connectedLines.push(Lines[newL - 1]);
+    needLineRedraw = true;
 }
 function deleteLine(id, refreshConnections = false) {
     if (refreshConnections) {
@@ -133,6 +122,7 @@ function deleteLine(id, refreshConnections = false) {
         Lines[i].dom2 = Lines[i].card2.cardDOM;
     }
     Lines.splice(id, 1);
+    needLineRedraw = true;
 }
 
 function findConnectedLines(StartLines, exceptionLines) {
@@ -220,6 +210,7 @@ function setThickness(StartLines = findFirstLines()) {
     });
     if (mainLine != -1)
         Lines[mainLine].thickness = nominalLength;
+    needLineRedraw = true;
 }
 
 document.addEventListener("wheel", (e)=>{
@@ -228,20 +219,30 @@ document.addEventListener("wheel", (e)=>{
         nominalLength += 1 * -e.deltaY/100;
         Lines[hover[1]].thickness = nominalLength;
     }
+    needLineRedraw = true;
 });
 
-function update() {
+let needLineRedraw = true;
+
+function updateLines() {
+    if (selectionSquare.isExist)
+        needLineRedraw = true;
+    if (!needLineRedraw) {
+        requestAnimationFrame(updateLines);
+        return;
+    }
+    console.log("redraw");
     ctx.fillStyle = "black";
     ctx.clearRect(0, 0, canv.width, canv.height);
-    for (let i = 0; i < Lines.length; i++) {
-        Lines[i].update();
-        Lines[i].draw();
-    }
     if (selectionSquare.isExist) {
         ctx.strokeStyle = "white";
         // ctx.strokeRect(selectionSquareInView.min[0], selectionSquareInView.min[1], selectionSquareInView.max[0], selectionSquareInView.max[1]);
         ctx.strokeRect(selectionSquare.min[0] - window.scrollX, selectionSquare.min[1] - window.scrollY, selectionSquare.max[0], selectionSquare.max[1]);
     }
-    requestAnimationFrame(update);
+    for (let i = 0; i < Lines.length; i++) {
+        Lines[i].draw();
+    }
+    needLineRedraw = false;
+    requestAnimationFrame(updateLines);
 }
-requestAnimationFrame(update);
+requestAnimationFrame(updateLines);

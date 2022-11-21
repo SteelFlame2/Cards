@@ -62,8 +62,8 @@ class Card {
     Initialize() {
         this.cardDOM.addEventListener("mousedown", (e) => {
             this.clickOffset = [
-                e.clientX - ~~(this.cardDOM.style.left.slice(0, -2)),
-                e.clientY - ~~(this.cardDOM.style.top.slice(0, -2))
+                ~~(this.cardDOM.style.left.slice(0, -2))-e.pageX,
+                ~~(this.cardDOM.style.top.slice(0, -2))-e.pageY
             ];
             if (e.buttons == 4) {
                 if (selectedCard1 == -1) {
@@ -116,9 +116,13 @@ class Card {
             //     this.cardDOM.style.left = (e.clientX - this.clickOffset[0]) + "px";
             // }
             if (this.isSelected && isSomeCardClicked) {
-                this.cardDOM.style.left = Number(this.cardDOM.style.left.slice(0, -2)) + (e.movementX / window.devicePixelRatio) + "px";
-                this.cardDOM.style.top = Number(this.cardDOM.style.top.slice(0, -2)) + (e.movementY / window.devicePixelRatio) + "px";
+                this.cardDOM.style.left = Number(this.cardDOM.style.left.slice(0, -2)) + (e.movementX) + "px";
+                this.cardDOM.style.top = Number(this.cardDOM.style.top.slice(0, -2)) + (e.movementY) + "px";
+                // this.cardDOM.style.left = (e.pageX+this.clickOffset[0]) + "px";
+                // this.cardDOM.style.top = (e.pageY+this.clickOffset[1]) + "px";
+
                 backUpdate();
+                needLineRedraw = true;
             }
         });
         document.addEventListener("mousedown", (e) => {
@@ -154,6 +158,7 @@ class Card {
                     // deleteLine(linesToDelete[i]);
                 }
                 Lines = newLines;
+                needLineRedraw = true;
                 this.cardDOM.className += " deleting";
                 setTimeout(()=>{
                     for (let i = this.id + 1; i < Cards.length; i++) {
@@ -338,7 +343,7 @@ function createNewStick(Header, Content, Offset = [Math.random() * (window.clien
     return newNode;
 }
 
-createNewStick("Fruits", [createTextReminder("Just a fruits... What?"), createListOfTasks("Fruits", ["Banana", "Apple", "Your mom"])])
+// createNewStick("Fruits", [createTextReminder("Just a fruits... What?"), createListOfTasks("Fruits", ["Banana", "Apple", "Your mom"])])
 // createNewStick("Fruits", [createTextReminder("Just a fruits... What?"), createListOfTasks("Fruits", ["Banana", "Apple", "Your mom"])])
 // createNewStick("Fruits", [createTextReminder("Just a fruits... What?"), createListOfTasks("Fruits", ["Banana", "Apple", "Your mom"])])
 // createNewStick("Fruits", [createTextReminder("Just a fruits... What?"), createListOfTasks("Fruits", ["Banana", "Apple", "Your mom"])])
