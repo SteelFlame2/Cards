@@ -1,6 +1,13 @@
 let canv = document.getElementById("canvas");
 let ctx = canv.getContext("2d");
 
+canv.width = window.innerWidth;
+canv.height = window.innerHeight;
+window.addEventListener("resize",(e) => {
+    canv.width = window.innerWidth;
+    canv.height = window.innerHeight;
+});
+
 function magnitude(a) {
     return Math.sqrt((a[0] ** 2) + (a[1] ** 2));
 }
@@ -20,6 +27,43 @@ function getInViewport(x, y) {
         return [x[0] - windowScroll[0], x[1] - windowScroll[1]];
     }
     return [x - windowScroll[0], y - windowScroll[1]];
+}
+function boxIntersection(p,P,A,B) {
+    let t = [(A[0]-p[0])/P[0], (A[1]-p[1])/P[1], (B[0]-p[0])/P[0], (B[1]-p[1])/P[1]];
+
+    let maxT = -Infinity, minT = Infinity, maxInd,minInd;
+    for (let i = 0; i < t.length; i++) {
+        if (maxT < t[i]) {
+            maxT = t[i];
+            maxInd = i;
+        }
+        if (minT > t[i]) {
+            minT = t[i];
+            minInd = i;
+        }
+    }
+    if (minInd > maxInd) {
+        t.splice(minInd,1);
+        t.splice(maxInd,1);
+    } else {
+        t.splice(maxInd,1);
+        t.splice(minInd,1);
+    }
+
+    if (t[0] > t[1])
+        t = [t[1],t[0]];
+
+    return t;
+}
+function drawArrow(a,b) {
+    let direction = normalize([(b[0]-a[0]),(b[1]-a[1])]);
+    let normal = normalize([(a[1]-b[1]),(b[0]-a[0])]);
+    ctx.moveTo(a[0],a[1]);
+    ctx.lineTo(b[0],b[1]);
+    ctx.moveTo(b[0],b[1]);
+    ctx.lineTo(b[0]-direction[0]*20+normal[0]*10,b[1]-direction[1]*20+normal[1]*10);
+    ctx.moveTo(b[0],b[1]);
+    ctx.lineTo(b[0]-direction[0]*20-normal[0]*10,b[1]-direction[1]*20-normal[1]*10);
 }
 
 var nominalLength = 5;
@@ -63,12 +107,24 @@ class Line {
     draw() {
         ctx.strokeStyle = "white";
         ctx.lineWidth = this.thickness;//Number(Cards[5].cardDOM.style.left.slice(0,-2))
-        let p1 = getInViewport([Number(this.dom1.style.left.slice(0,-2)) + this.dom1.clientWidth / 2, Number(this.dom1.style.top.slice(0,-2))]);
-        let p2 = getInViewport([Number(this.dom2.style.left.slice(0,-2)) + this.dom2.clientWidth / 2, Number(this.dom2.style.top.slice(0,-2))]);
+        ctx.lineCap = 'round';
+
+        let startRectPosition = getInViewport([Number(this.dom1.style.left.slice(0,-2)), Number(this.dom1.style.top.slice(0,-2))]);
+        let endRectPosition = getInViewport([Number(this.dom2.style.left.slice(0,-2)), Number(this.dom2.style.top.slice(0,-2))]);
+        let startPoint = [startRectPosition[0]+this.dom1.clientWidth/2, startRectPosition[1]+this.dom1.clientHeight/2];
+        let endPoint = [endRectPosition[0]+this.dom2.clientWidth/2-startPoint[0], endRectPosition[1]+this.dom2.clientHeight/2-startPoint[1]];
+
+        let intersectPoint1 = boxIntersection(startPoint,endPoint,startRectPosition,[startRectPosition[0]+this.dom1.clientWidth,startRectPosition[1]+this.dom1.clientHeight]);
+        let intersectPoint2 = boxIntersection(startPoint,endPoint,endRectPosition,[endRectPosition[0]+this.dom2.clientWidth,endRectPosition[1]+this.dom2.clientHeight]);
+        
+        intersectPoint1[1] += 0.03;
+        intersectPoint2[0] += -0.03;
+        
+        let p1 = ([startPoint[0]+(endPoint[0])*intersectPoint1[1],startPoint[1]+(endPoint[1])*intersectPoint1[1]]);
+        let p2 = ([startPoint[0]+(endPoint[0])*intersectPoint2[0],startPoint[1]+(endPoint[1])*intersectPoint2[0]]);
 
         ctx.beginPath();
-        ctx.moveTo(p1[0], p1[1]);
-        ctx.lineTo(p2[0], p2[1]);
+        drawArrow([p1[0],p1[1]],[p2[0],p2[1]]);
         ctx.stroke();
     }
     isHovered(mx, my) {
@@ -231,7 +287,7 @@ function updateLines() {
         requestAnimationFrame(updateLines);
         return;
     }
-    console.log("redraw");
+    // console.log("redraw");
     ctx.fillStyle = "black";
     ctx.clearRect(0, 0, canv.width, canv.height);
     if (selectionSquare.isExist) {
@@ -242,6 +298,17 @@ function updateLines() {
     for (let i = 0; i < Lines.length; i++) {
         Lines[i].draw();
     }
+
+    // A = [200,200];
+    // B = [500,500];
+    // ctx.strokeRect(A[0],A[1],B[0]-A[0],B[1]-A[1]);
+
+    // let t = boxIntersection([canv.width/2,canv.height/2],[canvasMousePosition[0]-canv.width/2,canvasMousePosition[1]-canv.height/2],A,B);
+    // ctx.beginPath();
+    // ctx.moveTo(canv.width/2,canv.height/2);
+    // ctx.lineTo(canv.width/2+(canvasMousePosition[0]-canv.width/2)*t[1],canv.height/2+(canvasMousePosition[1]-canv.height/2)*t[1]);
+    // ctx.stroke();
+
     needLineRedraw = false;
     requestAnimationFrame(updateLines);
 }

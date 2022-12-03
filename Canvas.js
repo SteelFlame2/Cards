@@ -1,17 +1,11 @@
 let bgCanv = document.getElementById("background-canvas");
 let bg = bgCanv.getContext("webgl");
 
-canv.width = window.innerWidth;
-canv.height = window.innerHeight;
-
 bgCanv.width = window.innerWidth;
 bgCanv.height = window.innerHeight;
 window.onresize = function (e) {
     bgCanv.width = window.innerWidth;
     bgCanv.height = window.innerHeight;
-
-    canv.width = window.innerWidth;
-    canv.height = window.innerHeight;
 }
 
 let haveBackgroundNoise = false;

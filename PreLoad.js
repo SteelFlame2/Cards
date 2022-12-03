@@ -9,6 +9,9 @@ document.addEventListener("mousemove", (e) => {
     canvasMousePosition = [e.clientX, e.clientY];
 });
 
+function inRgba(r,g,b,a=1) {
+    return "rgba("+(r*255)+","+(g*255)+","+(b*255)+","+a+")";
+}
 
 var pressedKeys = [];
 var onKeysPressEvents = [];

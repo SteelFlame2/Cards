@@ -46,6 +46,8 @@ addFewKeyPressEvent(["Escape"], ()=>{
 var isSomeCardClicked = false;
 class Card {
     constructor(id = -1, CardDOM) {
+        this.color = inRgba(1,1,1,1);
+
         this.id = id;
         this.cardDOM = CardDOM;
         this.data = this.getCardData();
@@ -213,7 +215,7 @@ class Card {
                 ContentData.push({ Type: "List", name: ContentChildrens[i].firstChild.nodeValue, data: ListTasks });
             }
         }
-        return [HeaderText, ContentData, [this.cardDOM.offsetLeft, this.cardDOM.offsetTop]];
+        return [HeaderText, ContentData, [this.cardDOM.offsetLeft, this.cardDOM.offsetTop], this.color];
     }
     isPointOnCard(x, y) {
         if (x > this.cardDOM.offsetLeft && x < this.cardDOM.offsetLeft + this.cardDOM.offsetWidth &&
@@ -236,6 +238,11 @@ class Card {
             return true;
         }
         return false;
+    }
+    GetCardRect() {
+        let position = [Number(this.cardDOM.style.left.slice(0,-2)),Number(this.cardDOM.style.top.slice(0,-2))];
+        let size = [this.cardDOM.clientWidth,this.cardDOM.clientHeight];
+        return [position,size];
     }
 }
 let Cards = [];
@@ -309,7 +316,7 @@ function createTextReminder(Text) {
     } catch (err) {}
     return Span;
 }
-function createNewStick(Header, Content, Offset = [Math.random() * (window.clientWidth - 200), Math.random() * (window.clientHeight - 200)]) {
+function createNewStick(Header, Content, Offset = [Math.random() * (window.clientWidth - 200), Math.random() * (window.clientHeight - 200)], Color = "rgba(1,1,1,1)") {
     let cardDom = document.createElement('div');
     cardDom.className = "card";
     // ${Cards.length}
@@ -335,8 +342,12 @@ function createNewStick(Header, Content, Offset = [Math.random() * (window.clien
     cardDom.style.left = Offset[0] + "px";
     cardDom.style.top = Offset[1] + "px";
 
+    // cardDom.style.backgroundColor = Color;
+
     let newNode = document.body.appendChild(cardDom);
-    Cards.push(new Card(Cards.length, cardDom));
+    let card = new Card(Cards.length, cardDom);
+    card.color = Color;
+    Cards.push(card);
 
     addRecomendation(Header);
 

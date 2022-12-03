@@ -47,7 +47,7 @@ function searchText(targetText, toFindTexts) {
                 }
             }
         }
-        if (sameLettersCount >= 1) {
+        if (sameLettersCount >= 0) {
             for (let j = 0; j < sameLetters.length; j++) {
                 for (let k = 0; k < sameLetters[j].length; k++) {
                     scores[i].value += 1/(1+Math.sqrt(Math.pow(sameLetters[j][k].pos2-sameLetters[j][k].pos1,2)));   
@@ -104,7 +104,6 @@ function createRecomendationDiv(text, count, id=0) {
             Number(cardDom.style.left.slice(0,-2)) - window.innerWidth/2,
             Number(cardDom.style.top.slice(0,-2)) - window.innerHeight/2);
         needLineRedraw = true;
-        console.log(needLineRedraw);
         searchTab.style.display = "none";
     });
     return mainDiv;

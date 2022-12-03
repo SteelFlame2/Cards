@@ -3,7 +3,7 @@ var scrollingBounder = document.getElementById("scrolling-bounds");
 
 let isClickHoldsOnDocument = false;
 document.addEventListener("mousedown", (e) => {
-    if (e.buttons == 1 && (e.target == canvas || e.target == document.body) && !isShiftClicked) {
+    if (e.buttons == 1 && (e.target == canvas || e.target == document.documentElement || e.target == document.body) && !isShiftClicked) {
         isClickHoldsOnDocument = true
     }
 });
@@ -13,7 +13,7 @@ document.addEventListener("mouseup", (e) => {
 document.addEventListener("mousemove", (e) => {
     // console.log(isClickHoldsOnDocument);
     if (isClickHoldsOnDocument) {
-        backUpdate();
+        // backUpdate();
         needLineRedraw = true;
         window.scrollBy(-e.movementX, -e.movementY);
         scrollingBounder.style.left = window.scrollX + "px";
@@ -80,7 +80,7 @@ function addCardsToTable(path, DB = save1DB) {
     CardsTable.clear();
     for (let i = 1; i < Cards.length; i++) {
         let data = Cards[i].getCardData();
-        CardsTable.add({ Header: data[0], Content: data[1], Position: data[2] });
+        CardsTable.add({ Header: data[0], Content: data[1], Position: data[2], Color: data[3] });
     }
 }
 function addLinesToTable(path, DB = save1DB) {
@@ -127,7 +127,8 @@ function loadData(path, DB = save1DB) {
                     newContent.push(createListOfTasks(e.target.result[i].Content[j].name, e.target.result[i].Content[j].data));
                 }
             }
-            createNewStick(e.target.result[i].Header, newContent, e.target.result[i].Position);
+            console.log(e.target.result[i]);
+            createNewStick(e.target.result[i].Header, newContent, e.target.result[i].Position, e.target.result[i].Color);
         }
         for (let i = 0; i < newLinesToPush.length; i++) {
             Lines.push(new Line(Cards[newLinesToPush[i].firstCardIndex], Cards[newLinesToPush[i].secondCardIndex], Lines.length, newLinesToPush[i].thick));
