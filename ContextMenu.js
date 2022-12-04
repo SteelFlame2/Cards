@@ -20,9 +20,10 @@ document.addEventListener("contextmenu", (e) => {
     setContextMenuVisibility(1);
     contextMenuDocumentDom.style.left = e.clientX + "px";
     contextMenuDocumentDom.style.top = e.clientY + "px";
-    lastClientContextMenuCallPosition = [e.clientX, e.clientY];
+    lastClientContextMenuCallPosition = [e.pageX, e.pageY];
 
-    let hover = findHoveredLineInPoint(e.clientX, e.clientY);
+    console.log(e.pageX,e.pageY);
+    let hover = findHoveredLineInPoint(e.pageX, e.pageY);
     if (hover[0]) {
         contexLineDeleter.className = "clickable";
         weightsUpdater.className = "clickable";

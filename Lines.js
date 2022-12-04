@@ -104,15 +104,13 @@ class Line {
             }
         });
     }
-    draw() {
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = this.thickness;//Number(Cards[5].cardDOM.style.left.slice(0,-2))
-        ctx.lineCap = 'round';
-
-        let startRectPosition = getInViewport([Number(this.dom1.style.left.slice(0,-2)), Number(this.dom1.style.top.slice(0,-2))]);
-        let endRectPosition = getInViewport([Number(this.dom2.style.left.slice(0,-2)), Number(this.dom2.style.top.slice(0,-2))]);
-        let startPoint = [startRectPosition[0]+this.dom1.clientWidth/2, startRectPosition[1]+this.dom1.clientHeight/2];
-        let endPoint = [endRectPosition[0]+this.dom2.clientWidth/2-startPoint[0], endRectPosition[1]+this.dom2.clientHeight/2-startPoint[1]];
+    GetLineViewportPoints() {
+        let card1Rect = [this.card1.styleData.pos,this.card1.styleData.size];
+        let card2Rect = [this.card2.styleData.pos,this.card2.styleData.size];
+        let startRectPosition = getInViewport([card1Rect[0][0], card1Rect[0][1]]);
+        let endRectPosition = getInViewport([card2Rect[0][0], card2Rect[0][1]]);
+        let startPoint = [startRectPosition[0]+card1Rect[1][0]/2, startRectPosition[1]+card1Rect[1][1]/2];
+        let endPoint = [endRectPosition[0]+card2Rect[1][0]/2-startPoint[0], endRectPosition[1]+card2Rect[1][1]/2-startPoint[1]];
 
         let intersectPoint1 = boxIntersection(startPoint,endPoint,startRectPosition,[startRectPosition[0]+this.dom1.clientWidth,startRectPosition[1]+this.dom1.clientHeight]);
         let intersectPoint2 = boxIntersection(startPoint,endPoint,endRectPosition,[endRectPosition[0]+this.dom2.clientWidth,endRectPosition[1]+this.dom2.clientHeight]);
@@ -123,22 +121,36 @@ class Line {
         let p1 = ([startPoint[0]+(endPoint[0])*intersectPoint1[1],startPoint[1]+(endPoint[1])*intersectPoint1[1]]);
         let p2 = ([startPoint[0]+(endPoint[0])*intersectPoint2[0],startPoint[1]+(endPoint[1])*intersectPoint2[0]]);
 
+        return [p1,p2];
+    }
+    draw() {
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = this.thickness;//Number(Cards[5].cardDOM.style.left.slice(0,-2))
+        ctx.lineCap = 'round';
+
+        let points = this.GetLineViewportPoints();
+
         ctx.beginPath();
-        drawArrow([p1[0],p1[1]],[p2[0],p2[1]]);
+        drawArrow([points[0][0],points[0][1]],[points[1][0],points[1][1]]);
         ctx.stroke();
     }
-    isHovered(mx, my) {
+    isHovered(mx, my, maxDst = 12) {
+        let p1 = [Number(this.dom1.style.left.slice(0,-2))+this.dom1.clientWidth/2, Number(this.dom1.style.top.slice(0,-2))+this.dom1.clientHeight/2];
+        let p2 = [Number(this.dom2.style.left.slice(0,-2))+this.dom2.clientWidth/2, Number(this.dom2.style.top.slice(0,-2))+this.dom2.clientHeight/2];
+        
+        // console.log(p1,p2);
+
         let delta1 = [
-            (Number(this.dom2.style.left.slice(0,-2))  + this.dom2.clientWidth / 2) - (Number(this.dom1.style.left.slice(0,-2)) + this.dom1.clientWidth / 2),
-            Number(this.dom2.style.top.slice(0,-2))  - Number(this.dom1.style.top.slice(0,-2)),
+            p2[0]-p1[0],
+            p2[1]-p1[1],
         ];
         let delta2 = [
-            (Number(this.dom1.style.left.slice(0,-2))  + this.dom1.clientWidth / 2) - (mx + window.scrollX),
-            Number(this.dom1.style.top.slice(0,-2))  - (my + window.scrollY),
+            p1[0] - (mx),
+            p1[1] - (my),
         ];
         let L = dot(normalize(delta1), [-delta2[0], -delta2[1]]);
-        if (Math.abs(pseudoDot(delta2, normalize(delta1))) < 12 &&
-            L > 0 && L < magnitude(delta1)) {
+        if (Math.abs(dot([-delta2[1],delta2[0]], normalize(delta1))) < maxDst && L > 0 && L < magnitude(delta1)) {
+            // console.log(dot([-delta2[1],delta2[0]], normalize(delta1)));
             return true;
         }
         return false;
@@ -270,7 +282,7 @@ function setThickness(StartLines = findFirstLines()) {
 }
 
 document.addEventListener("wheel", (e)=>{
-    let hover = findHoveredLineInPoint(e.clientX,e.clientY);
+    let hover = findHoveredLineInPoint(e.pageX,e.pageY);
     if (hover[0]) {
         nominalLength += 1 * -e.deltaY/100;
         Lines[hover[1]].thickness = nominalLength;

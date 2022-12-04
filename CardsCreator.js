@@ -121,7 +121,8 @@ cardCreator.CreateNewStickButton.addEventListener("click", (e) => {
     while (toPreDeleteElements.length > 0) {
         toPreDeleteElements[0].remove();
     }
-    let newNode = createNewStick(cardCreator.HeaderInput.value, toCreateElements);
+    let clr = getCardRandomColor();
+    let newNode = createNewStick(cardCreator.HeaderInput.value, toCreateElements, [cardCreator.dom.style.left,cardCreator.dom.style.top], clr);
     newNode.style.left = cardCreator.dom.style.left;
     newNode.style.top = cardCreator.dom.style.top;
 

@@ -4,6 +4,10 @@ var mousePosition = [0, 0];
 var canvasMousePosition = [0, 0];
 var windowScroll = [0,0];
 
+
+let needMinimapRedraw = true;
+
+
 document.addEventListener("mousemove", (e) => {
     mousePosition = [e.pageX, e.pageY];
     canvasMousePosition = [e.clientX, e.clientY];
@@ -11,6 +15,12 @@ document.addEventListener("mousemove", (e) => {
 
 function inRgba(r,g,b,a=1) {
     return "rgba("+(r*255)+","+(g*255)+","+(b*255)+","+a+")";
+}
+function getCardRandomColor() {
+    let cR = 100+Math.random()*155;
+    let cG = 100+Math.random()*155;
+    let cB = 100+Math.random()*155;
+    return inRgba(cR/255,cG/255,cB/255,0.8);
 }
 
 var pressedKeys = [];

@@ -8,6 +8,53 @@ class Minimap {
         this.size = Size;
         this.canv = this.GenerateCanvas();
         this.ctx = this.canv.getContext('2d');
+
+        this.hoveredLinedData = [];
+        this.isMouseOverLine = false;
+        this.canv.addEventListener("mousemove",(e)=>{
+            this.isMouseOverLine = false;
+            let pointedLine = -1;
+            let pointedCard = -1;
+            for (let i = 0; i < Lines.length; i++) {
+                let p = this.MinimapPositionToGlobal([e.layerX,e.layerY]);
+                if (this.lines[i].isHovered(p[0],p[1],40)) {
+                    pointedLine=i;
+                }
+            }
+            for (let i = 0; i < Cards.length; i++) {
+                let p = this.MinimapPositionToGlobal([e.layerX,e.layerY]);
+                if (this.cards[i].isPointOnCard(p[0],p[1])) {
+                    pointedCard=i;
+                }
+            }
+            if (pointedLine > -1) {
+                this.hoveredLinedData = [this.lines[pointedLine].card1.GetHeader(),e.layerX,e.layerY];
+                this.isMouseOverLine = true;
+            }
+            if (pointedCard > -1) {
+                this.hoveredLinedData = [this.cards[pointedCard].GetHeader(),e.layerX,e.layerY];
+                this.isMouseOverLine = true;
+            }
+            needMinimapRedraw = true;
+        });
+        this.canv.addEventListener("mousedown", (e)=>{
+            let pos = this.MinimapPositionToGlobal([e.layerX,e.layerY]);
+            window.scrollTo(pos[0]-window.innerWidth/2, pos[1]-window.innerHeight/2);
+            needLineRedraw = true;
+            needMinimapRedraw = true;
+        });
+        
+        this.isBoundsChanged = true;
+        onSomeCardMoved.push(() => {
+            this.isBoundsChanged = true;
+            needMinimapRedraw = true;
+        });
+        
+        onCardsLoadedFuncs.push(()=>{
+            this.isBoundsChanged = true;
+            this.bounds = this.GetCardsBounds();
+            needMinimapRedraw = true;
+        });
     }
     SetPosition(pos) {
         this.canv.style.left = pos[0]+"px";
@@ -38,52 +85,77 @@ class Minimap {
         return canv;
     }
     GetCardsBounds() {
-        let min = [Infinity,Infinity];
-        let max = [-Infinity,-Infinity];
+        if (this.isBoundsChanged) {
+            let min = [Infinity,Infinity];
+            let max = [-Infinity,-Infinity];
 
-        for (let i = 0; i < this.cards.length; i++) {
-            let pos = this.cards[i].GetCardRect()[0];
-            if (min[0] > pos[0]) {
-                min[0] = pos[0];
+            for (let i = 0; i < this.cards.length; i++) {
+                let pos = this.cards[i].GetCardRect()[0];
+                if (min[0] > pos[0]) {
+                    min[0] = pos[0];
+                }
+                if (max[0] < pos[0]) {
+                    max[0] = pos[0];
+                }
+                if (min[1] > pos[1]) {
+                    min[1] = pos[1];
+                }
+                if (max[1] < pos[1]) {
+                    max[1] = pos[1];
+                }
             }
-            if (max[0] < pos[0]) {
-                max[0] = pos[0];
-            }
-            if (min[1] > pos[1]) {
-                min[1] = pos[1];
-            }
-            if (max[1] < pos[1]) {
-                max[1] = pos[1];
-            }
+            this.bounds = [min,max];
+            this.isBoundsChanged = false;
+            return [min,max];
+        } else {
+            return this.bounds;
         }
-        return [min,max];
     }
     GlobalPositionToMinimap(pos) {
         let bounds = this.GetCardsBounds();
-        bounds[1][0] += 200;
-        bounds[1][1] += 200;
-        return [pos[0]/bounds[1][0]*this.size[0],pos[1]/bounds[1][1]*this.size[1]];
+        return [pos[0]/(bounds[1][0]+200)*this.size[0],pos[1]/(bounds[1][1]+200)*this.size[1]];
+    }
+    GlobalRectToPosition(Rect) {
+        let pos = this.GlobalPositionToMinimap(Rect[0]);
+        let size = this.GlobalPositionToMinimap([Rect[0][0]+Rect[1][0],Rect[0][1]+Rect[1][1]]);
+        size = [size[0]-pos[0],size[1]-pos[1]];
+        return [pos,size];
+    } 
+    MinimapPositionToGlobal(pos) {
+        let bounds = this.GetCardsBounds();
+
+        return [pos[0]/this.size[0]*(bounds[1][0]+200),pos[1]/this.size[1]*(bounds[1][1]+200)];
+    }
+    IsPointOnLine(mousePos) {
+        let ind = -1;
+        for (let i = 0; i < this.lines.length; i++) {
+            let p = this.MinimapPositionToGlobal(mousePos);
+            if (this.lines[i].isHovered(p[0],p[1],40)) {
+                ind=i;
+            }
+        }
+        return ind;
     }
     DrawLines() {
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeStyle = inRgba(1,1,1,alpha);
-        this.ctx.beginPath();
+        this.ctx.lineWidth = 2;
         for (let i = 0; i < this.lines.length; i++) {
-            let pos1 = this.GlobalPositionToMinimap(this.lines[i].card1.GetCardRect()[0]);
-            let pos2 = this.GlobalPositionToMinimap(this.lines[i].card2.GetCardRect()[0]);
+            this.ctx.strokeStyle = this.lines[i].card1.color;
+            this.ctx.beginPath();
+            let rect1 = this.GlobalRectToPosition(this.lines[i].card1.GetCardRect());
+            let rect2 = this.GlobalRectToPosition(this.lines[i].card2.GetCardRect());
             
-            this.ctx.moveTo(pos1[0],pos1[1]);
-            this.ctx.lineTo(pos2[0],pos2[1]);
+            this.ctx.moveTo(rect1[0][0]+rect1[1][0]/2,rect1[0][1]+rect1[1][1]/2);
+            this.ctx.lineTo(rect2[0][0]+rect2[1][0]/2,rect2[0][1]+rect2[1][1]/2);
 
+            this.ctx.stroke();
         }
-        this.ctx.stroke();
     }
     DrawTargets() {
         for (let i = 0; i < this.cards.length; i++) {
-            let targetPosition = this.GlobalPositionToMinimap(this.cards[i].GetCardRect()[0]);
+            let targetRect = this.GlobalRectToPosition(this.cards[i].GetCardRect());
 
-            this.ctx.fillStyle = inRgba(0,1,0,alpha);
-            this.ctx.fillRect(targetPosition[0],targetPosition[1],1,1);
+            this.ctx.fillStyle = this.cards[i].color;
+            this.ctx.fillRect(targetRect[0][0],targetRect[0][1],targetRect[1][0],targetRect[1][1]);
         }
     }
     DrawPrimaryUI() {
@@ -100,6 +172,12 @@ class Minimap {
 
         this.ctx.strokeStyle = inRgba(1,1,1,alpha);
         this.ctx.strokeRect(viewPosMin[0],viewPosMin[1],viewPosMax[0]-viewPosMin[0],viewPosMax[1]-viewPosMin[1]);
+
+        if (this.isMouseOverLine) {
+            this.ctx.fillStyle = "White";
+            this.ctx.font = "16px Arial";
+            this.ctx.fillText(this.hoveredLinedData[0],this.hoveredLinedData[1],this.hoveredLinedData[2]);
+        }
     }
     Draw() {
         this.ctx.clearRect(0,0,this.canv.width,this.canv.height);
@@ -111,32 +189,42 @@ class Minimap {
     }
 }
 
-var miniMapSize = 100;
+var miniMapSize = 100/window.devicePixelRatio;
 var miniMap = new Minimap([canv.width-miniMapSize-5,5],[miniMapSize,miniMapSize], Cards, Lines);
 window.addEventListener("resize",(e) => {
-    // miniMapSize = 200;
+    miniMapSize = 100/window.devicePixelRatio;
     miniMap.SetSize([miniMapSize,miniMapSize]);
     miniMap.SetPosition([window.innerWidth-miniMapSize-5,5]);
+    needMinimapRedraw = true;
 });
 
 miniMap.canv.addEventListener("mouseenter", (e) => {
-    miniMapSize = 400;
+    miniMapSize = 400/window.devicePixelRatio;
     miniMap.SetSize([miniMapSize,miniMapSize]);
     miniMap.SetPosition([window.innerWidth-miniMapSize-5,5]);
 
     alpha = 1;
+    needMinimapRedraw = true;
 });
 miniMap.canv.addEventListener("mouseleave", (e) => {
-    miniMapSize = 100;
+    miniMapSize = 100/window.devicePixelRatio;
     miniMap.SetSize([miniMapSize,miniMapSize]);
     miniMap.SetPosition([window.innerWidth-miniMapSize-5,5]);
 
     alpha = 0.6;
+    needMinimapRedraw = true;
 });
 
 function updateMinimap() {
-
-    miniMap.Draw();
+    if (needMinimapRedraw) {
+        miniMap.Draw();
+        needMinimapRedraw = false;
+    }
     requestAnimationFrame(updateMinimap);
 }
 requestAnimationFrame(updateMinimap);
+
+window.addEventListener("load", (e) =>{ 
+    needMinimapRedraw = true;
+
+});

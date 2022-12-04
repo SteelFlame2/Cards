@@ -15,6 +15,7 @@ document.addEventListener("mousemove", (e) => {
     if (isClickHoldsOnDocument) {
         // backUpdate();
         needLineRedraw = true;
+        needMinimapRedraw = true;
         window.scrollBy(-e.movementX, -e.movementY);
         scrollingBounder.style.left = window.scrollX + "px";
         scrollingBounder.style.top = window.scrollY + "px";
@@ -95,6 +96,7 @@ function saveData(path, DB = save1DB) {
     addCardsToTable(path,DB);
     addLinesToTable(path,DB);
 }
+let onCardsLoadedFuncs = [];
 var newLinesToPush = [];
 function loadData(path, DB = save1DB) {
     Cards.splice(1, Cards.length - 1);
@@ -127,8 +129,11 @@ function loadData(path, DB = save1DB) {
                     newContent.push(createListOfTasks(e.target.result[i].Content[j].name, e.target.result[i].Content[j].data));
                 }
             }
-            console.log(e.target.result[i]);
+            // console.log(e.target.result[i]);
             createNewStick(e.target.result[i].Header, newContent, e.target.result[i].Position, e.target.result[i].Color);
+        }
+        for (let i = 0; i < onCardsLoadedFuncs.length; i++) {
+            onCardsLoadedFuncs[i]();
         }
         for (let i = 0; i < newLinesToPush.length; i++) {
             Lines.push(new Line(Cards[newLinesToPush[i].firstCardIndex], Cards[newLinesToPush[i].secondCardIndex], Lines.length, newLinesToPush[i].thick));

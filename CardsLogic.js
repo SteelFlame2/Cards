@@ -43,11 +43,11 @@ addFewKeyPressEvent(["Escape"], ()=>{
     searchTab.style.display = "none";
 });
 
+var onSomeCardMoved = [];
+
 var isSomeCardClicked = false;
 class Card {
     constructor(id = -1, CardDOM) {
-        this.color = inRgba(1,1,1,1);
-
         this.id = id;
         this.cardDOM = CardDOM;
         this.data = this.getCardData();
@@ -57,9 +57,20 @@ class Card {
 
         this.isSelected = false;
 
+        this.color = inRgba(1,1,1,1);
+        this.styleData = this.RecalculateStyleData();
+
         this.Initialize();
 
         this.connectedLines = [];
+
+        this.onCardMoveFunctions = [];
+    }
+    RecalculateStyleData() {
+        let position = [Number(this.cardDOM.style.left.slice(0,-2)),Number(this.cardDOM.style.top.slice(0,-2))];
+        let size = [this.cardDOM.clientWidth,this.cardDOM.clientHeight];
+        this.styleData = {pos: position, size: size};
+        return this.styleData;
     }
     Initialize() {
         this.cardDOM.addEventListener("mousedown", (e) => {
@@ -113,18 +124,21 @@ class Card {
             isSomeCardClicked = false;
         });
         document.addEventListener("mousemove", (e) => {
-            // if (this.isClicked) {
-            //     this.cardDOM.style.top = (e.clientY - this.clickOffset[1]) + "px";
-            //     this.cardDOM.style.left = (e.clientX - this.clickOffset[0]) + "px";
-            // }
             if (this.isSelected && isSomeCardClicked) {
                 this.cardDOM.style.left = Number(this.cardDOM.style.left.slice(0, -2)) + (e.movementX) + "px";
                 this.cardDOM.style.top = Number(this.cardDOM.style.top.slice(0, -2)) + (e.movementY) + "px";
                 // this.cardDOM.style.left = (e.pageX+this.clickOffset[0]) + "px";
                 // this.cardDOM.style.top = (e.pageY+this.clickOffset[1]) + "px";
+            this.RecalculateStyleData();
 
                 backUpdate();
                 needLineRedraw = true;
+                for (let i = 0; i < this.onCardMoveFunctions.length; i++) {
+                    this.onCardMoveFunctions[i]();
+                }
+                for (let i = 0; i < onSomeCardMoved.length; i++) {
+                    onSomeCardMoved[i]();
+                }
             }
         });
         document.addEventListener("mousedown", (e) => {
@@ -240,9 +254,10 @@ class Card {
         return false;
     }
     GetCardRect() {
-        let position = [Number(this.cardDOM.style.left.slice(0,-2)),Number(this.cardDOM.style.top.slice(0,-2))];
-        let size = [this.cardDOM.clientWidth,this.cardDOM.clientHeight];
-        return [position,size];
+        return [this.styleData.pos,this.styleData.size];
+    }
+    GetHeader() {
+        return this.cardDOM.children[0].children[0].innerText;
     }
 }
 let Cards = [];
@@ -251,8 +266,6 @@ let _cards = document.getElementsByClassName("card");
 for (let i = 0; i < _cards.length; i++) {
     Cards.push(new Card(i, _cards[i]));
 }
-
-
 
 function createListOfTasks(ListName, Tasks) { // Just array of strings with task text 
     let ulMain = document.createElement("ul");
@@ -316,7 +329,7 @@ function createTextReminder(Text) {
     } catch (err) {}
     return Span;
 }
-function createNewStick(Header, Content, Offset = [Math.random() * (window.clientWidth - 200), Math.random() * (window.clientHeight - 200)], Color = "rgba(1,1,1,1)") {
+function createNewStick(Header, Content, Offset = [Math.random() * (window.clientWidth - 200), Math.random() * (window.clientHeight - 200)], Color = NaN) {
     let cardDom = document.createElement('div');
     cardDom.className = "card";
     // ${Cards.length}
@@ -337,16 +350,35 @@ function createNewStick(Header, Content, Offset = [Math.random() * (window.clien
         // contentDiv.innerHTML += "<br>";
     }
 
-    cardDom.appendChild(contentDiv);
-
     cardDom.style.left = Offset[0] + "px";
     cardDom.style.top = Offset[1] + "px";
-
-    // cardDom.style.backgroundColor = Color;
+    cardDom.appendChild(contentDiv);
 
     let newNode = document.body.appendChild(cardDom);
     let card = new Card(Cards.length, cardDom);
-    card.color = Color;
+
+    let isHeaderExist = false;
+    let existHeaderInd = -1;
+    for (let i = 0; i < Cards.length; i++) {
+        if (Cards[i].GetHeader() == Header) {
+            existHeaderInd = i;
+            isHeaderExist = true;
+        }
+    }
+    if (isHeaderExist) {
+        cardDom.style.backgroundColor = Cards[existHeaderInd].color;
+        card.color = Cards[existHeaderInd].color;
+    } else {
+        if (!isNaN(Color)) {
+            cardDom.style.backgroundColor = Color;
+            card.color = Color;
+        } else {
+            let color = getCardRandomColor();
+            cardDom.style.backgroundColor = color;
+            card.color = color;
+        }
+    }
+
     Cards.push(card);
 
     addRecomendation(Header);
